@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>λ | No-Bullshit File Sharing</title>
+
+    {% from "_util.html" import import_css %}
+    {{ import_css('main_css') }}
+    {{ import_css('about_css') }}
+
+    <link rel="apple-touch-icon" sizes="57x57" href="/static/img/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="/static/img/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/static/img/apple-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="/static/img/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/static/img/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="/static/img/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/static/img/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/static/img/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/img/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192"  href="/static/img/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="96x96" href="/static/img/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/img/favicon-16x16.png">
+    <link rel="manifest" href="/static/other/manifest.json">
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="/static/img/ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+</head>
+
+<body>
+<header>
+    <div class="top-bar">
+        <div class="content">
+            <ul class="unimportant">
+                <li><a href="/" class="smallcaps bold">about</a></li>
+                <li><a href="/" class="smallcaps bold">apps</a></li>
+            </ul>
+            <div class="right">
+                <ul>
+                    <li><a href="/paste" class="smallcaps bold">paste</a></li>
+                    <li><a href="#" class="smallcaps bold">upload</a></li>
+                </ul>
+                <ul>
+                    <li><a href="/login" class="plaque">Not Signed In</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</header>
+<main class="content">
+    <section>
+    <h3>About</h3>
+    <p>Lambda is an image and video hosting service that respects your privacy. The main goals of Lambda are to provide fast uploads, short links, direct downloads, and do that all while being as unintrusive as possible.</p>
+    </section>
+
+    <section>
+    <h3>Security</h3>
+    <p>Lambda's paste service is fully encrypted client-side. The actual content of what you paste never hits the server, nor does the decryption key. Only people that you give the link to can access the paste, even if the server is seized.</p>
+    </section>
+
+    <section>
+    <h3>Domains</h3>
+    <p>Uploads can be linked via the following domains:</p>
+    <ul>
+        <li><a href="https://lambda.sx">lambda.sx</a></li>
+        <li><a href="https://xn--wxa.pw">λ.pw</a></li>
+    </ul>
+    </section>
+
+    <section>
+    <h3>Uploads</h3>
+    <p>Registered Lambda users can upload files up to 50 megabytes while anonymous uploads are limited to 6 megabytes.</p>
+    <p>Uploads from logged-in users are never automatically deleted.</p>
+    <p>The following types are supported:</p>
+    <ul class="csl">
+        <li>png</li>
+        <li>gif</li>
+        <li>jpg</li>
+        <li>mp3</li>
+        <li>ogg</li>
+        <li>opus</li>
+        <li>mp4</li>
+        <li>webm</li>
+    </ul>
+    </section>
+</main>
+</body>
+
+</html>

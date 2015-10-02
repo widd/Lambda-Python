@@ -1,0 +1,11 @@
+{% macro import_css(name) %}
+    {% assets name %}
+        <link rel="stylesheet" href="{{ ASSET_URL }}" type="text/css">
+    {% endassets %}
+{% endmacro %}
+
+{% macro import_js(name) %}
+    {% assets name %}
+        <script src="{{ ASSET_URL }}" defer></script>
+    {% endassets %}
+{% endmacro %}
