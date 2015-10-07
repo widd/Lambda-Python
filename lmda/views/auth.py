@@ -51,12 +51,12 @@ def get_session_info():
     from lmda.models import User
 
     user = current_user
-    if user is None or user.is_anonymous():
+    if user is None or user.is_anonymous:
         api_key = request.args.get('api_key')
         if api_key is not None:
             user = User.by_api_key(api_key)
 
-    if user is None or user.is_anonymous():
+    if user is None or user.is_anonymous:
         response.errors.append('No session cookie or api_key. Did you forget to log in?')
         return Response(json.dumps(response, cls=ResponseEncoder), status=400, mimetype='application/json')
 
