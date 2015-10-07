@@ -17,9 +17,6 @@ pwd_context = CryptContext(
 )
 
 
-# TODO send something that isn't 200 when an error happens
-
-
 class EmptyClass:
     pass
 
