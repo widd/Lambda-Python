@@ -1,6 +1,6 @@
 import datetime
 import json
-from flask import render_template, request, Response
+from flask import render_template, request, Response, abort
 from flask.ext.login import current_user
 from lmda import app, ResponseEncoder, database
 from lmda.models import Paste
@@ -69,8 +69,8 @@ def put_paste():
     return Response(json.dumps(response, cls=ResponseEncoder), mimetype='application/json')
 
 
-@app.route('/<name>', methods=['GET'])
 def view_paste(name):
-    # TODO call from view image
-    # TODO 404 if doesn't exist
-    return render_template('viewPaste.html')
+    paste = Paste.by_name(name)
+    if paste is not None:
+        return render_template('viewPaste.html')
+    abort(404)

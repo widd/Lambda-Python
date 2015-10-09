@@ -2,10 +2,11 @@ import json
 import os
 import random
 import string
-from flask import render_template, request
+from flask import render_template, request, send_from_directory
 from flask.ext.login import current_user
 import sys
 from lmda import app, database
+from lmda.views import paste
 
 
 class UploadResponse:
@@ -102,3 +103,15 @@ def gen_filename(max_tries=5, start_length=3, tries_per_len_incr=3):
                 continue
 
         return filename
+
+
+@app.route('/<name>', methods=['GET'])
+def view_image(name):
+    print(name)
+    path = os.path.join(app.config['UPLOAD_FOLDER'], name)
+    for extension in app.config['ALLOWED_TYPES']:
+        if os.path.isfile(path + '.' + extension):  # file exists
+            print(os.getcwd() + '/' + app.config['UPLOAD_FOLDER'])
+            return send_from_directory(os.getcwd() + '/' + app.config['UPLOAD_FOLDER'], name + '.' + extension)
+
+    return paste.view_paste(name)
