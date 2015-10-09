@@ -123,6 +123,11 @@ document.addEventListener("DOMContentLoaded", =>
     for file in files
       checkAndUpload(file)
   )
+
+  selectInput = document.getElementById('chooseFile')
+  selectInput.addEventListener('change', =>
+    checkAndUpload(selectInput.files[0])
+  )
 )
 
 

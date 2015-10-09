@@ -34,12 +34,14 @@
 </header>
 <main class="content">
     <h1 class="upload-label">Upload</h1>
-    <h2 class="upload-instruction">Drag and drop or click <a href="#">here</a> to upload a file</h2>
+    <h2 class="upload-instruction">Drag and drop or click <a href="#" onclick="document.getElementById('chooseFile').click();return false;">here</a> to upload a file</h2>
 
     <ul class="uploads finished" id="finished-uploads">
     </ul>
     <ul class="uploads" id="ongoing-uploads">
     </ul>
+
+    <input type="file" id="chooseFile" style="visibility: hidden;">
 </main>
 
 {% from "_util.html" import import_js %}
