@@ -1,12 +1,27 @@
 uploadUrl = "/api/upload"
-allowedTypes = ["image/png"]
+configUrl = "/api/upload/restrictions"
+uploadDomain = "/"
+allowedExtensions = []
 sizeLimit = 20  # MB
 apikey = ""
+
+fetchServerConfig = =>
+  # TODO care about the anonymous stuff
+
+  xmlHttp = new XMLHttpRequest()
+  xmlHttp.onreadystatechange = =>
+    if xmlHttp.readyState == 4 && xmlHttp.status == 200
+        response = JSON.parse(xmlHttp.responseText)
+        uploadDomain = response.upload_domain
+        sizeLimit = response.max_filesize_mb
+        allowedExtensions = response.allowed_types
+  xmlHttp.open("GET", configUrl, true)  # true for asynchronous
+  xmlHttp.send(null);
 
 
 checkAndUpload = (file) ->
   if not isTypeAllowed(file)
-    alert('Filetype "' + file.type + '" is not supported')
+    alert('Filetype "' + getExtension(file) + '" is not supported')
     return
   if file.size > sizeLimit*1000000
     alert('File is too large. Max size is ' + sizeLimit + ' MB.')
@@ -116,4 +131,11 @@ isImage = (file) ->
 
 
 isTypeAllowed = (file) ->
-  return file.type in allowedTypes
+  return getExtension(file) in allowedExtensions
+
+
+getExtension = (file) ->
+  return file.name.split('.').pop()
+
+
+fetchServerConfig()

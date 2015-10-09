@@ -8,6 +8,11 @@ from webassets.filter import get_filter
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['ALLOWED_TYPES'] = ['png', 'jpg', 'jpeg']
+app.config['ANONYMOUS_UPLOAD'] = True
+app.config['ANONYMOUS_PASTE'] = True
+app.config['MAX_FILESIZE_MB'] = 20
+app.config['MAX_ANONYMOUS_FILESIZE_MB'] = 6
+app.config['UPLOAD_DOMAIN'] = "/"
 app.config['SECRET_KEY'] = 'SUPER_SECRET'
 
 login_manager = LoginManager(app)

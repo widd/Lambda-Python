@@ -2,7 +2,7 @@ import json
 import os
 import random
 import string
-from flask import render_template, request, send_from_directory
+from flask import render_template, request, send_from_directory, Response
 from flask.ext.login import current_user
 import sys
 from lmda import app, database
@@ -29,8 +29,15 @@ def upload():
 
 @app.route('/api/upload/restrictions', methods=['GET'])
 def restrictions():
-    # TODO json w/ max filesize, allow anonymous, max anon filesize, list of supported mime types
-    return ""
+    response = UploadResponse()
+
+    response.anonymous_upload = app.config["ANONYMOUS_UPLOAD"]
+    response.allowed_types = app.config['ALLOWED_TYPES']
+    response.max_filesize_mb = app.config['MAX_FILESIZE_MB']
+    response.max_anon_filesize_mb = app.config['MAX_ANONYMOUS_FILESIZE_MB']
+    response.upload_domain = app.config['UPLOAD_DOMAIN']
+
+    return Response(json.dumps(response, cls=ResponseEncoder), mimetype='application/json')
 
 
 @app.route('/api/upload', methods=['PUT'])
@@ -113,5 +120,7 @@ def view_image(name):
     for extension in app.config['ALLOWED_TYPES']:
         if os.path.isfile(path + '.' + extension):  # file exists
             return send_from_directory(os.getcwd() + '/' + app.config['UPLOAD_FOLDER'], name + '.' + extension)
+
+    # TODO Serve with MIME type header of the extension of the file, to prevent uploading of not-allowed files with a fake extension
 
     return paste.view_paste(name)
