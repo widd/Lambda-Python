@@ -10,7 +10,7 @@ toggleCode = =>
       codeLabel.className = "enabled"
     myCodeMirror = CodeMirror.fromTextArea(document.getElementById('paste-area'), {
       lineNumbers: true,
-      theme: 'solarized dark'
+      theme: 'zenburn'
     })
   else
     if codeLabel
@@ -24,10 +24,13 @@ toggleCode = =>
 
 toggleTopbar = =>
   header = document.querySelector("header")
+  timeRemaining = document.getElementById("time-remaining")
   if showTopbar
     header.className = "hidden"
+    timeRemaining.className = "time-remaining"
   else
     header.className = "regular"
+    timeRemaining.className = "hidden"
 
   showTopbar = !showTopbar
 
