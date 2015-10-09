@@ -87,7 +87,7 @@ onUploadFinish = (response) ->
   uploadEl = document.createElement("li")
 
   uploadEl.onclick = =>
-    window.location = url
+    window.location = uploadDomain + url
 
 
   if isImage(response.file)
@@ -98,7 +98,7 @@ onUploadFinish = (response) ->
   contentArea = document.createElement("div")
 
   uploadLink = document.createElement("a")
-  uploadLink.href = url
+  uploadLink.href = uploadDomain + url
 
   uploadLink.innerHTML = response.file.name
 
