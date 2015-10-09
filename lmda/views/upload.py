@@ -107,11 +107,11 @@ def gen_filename(max_tries=5, start_length=3, tries_per_len_incr=3):
 
 @app.route('/<name>', methods=['GET'])
 def view_image(name):
-    print(name)
     path = os.path.join(app.config['UPLOAD_FOLDER'], name)
+    if os.path.isfile(path):  # file exists
+        return send_from_directory(os.getcwd() + '/' + app.config['UPLOAD_FOLDER'], name)
     for extension in app.config['ALLOWED_TYPES']:
         if os.path.isfile(path + '.' + extension):  # file exists
-            print(os.getcwd() + '/' + app.config['UPLOAD_FOLDER'])
             return send_from_directory(os.getcwd() + '/' + app.config['UPLOAD_FOLDER'], name + '.' + extension)
 
     return paste.view_paste(name)
