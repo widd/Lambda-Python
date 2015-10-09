@@ -23,8 +23,16 @@
 
 .uploads div
   margin: 0 10px
-  width: 100%
+  width: 270px
+  padding-right: 15px
   align-self: center
+
+.uploads div span
+  text-overflow: ellipsis
+  max-width: 66%
+  white-space: nowrap
+  display: block
+  overflow: hidden
 
 .uploads.finished li:hover
   cursor: pointer
@@ -44,8 +52,16 @@ progress
 
 .uploads li img
   height: 60px
+  max-width: 100px
   margin: -8px 0 -8px -8px
   opacity: 0.6
 
 .uploads.finished li img
   opacity: 1
+
+.uploads.finished li a
+  text-overflow: ellipsis
+  max-width: 66%
+  white-space: nowrap
+  display: block
+  overflow: hidden

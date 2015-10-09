@@ -4,6 +4,7 @@ import random
 import string
 from flask import render_template, request
 from flask.ext.login import current_user
+import sys
 from lmda import app, database
 
 
@@ -23,6 +24,12 @@ class ResponseEncoder(json.JSONEncoder):
 @app.route('/upload')
 def upload():
     return render_template('upload.html')
+
+
+@app.route('/api/upload/restrictions', methods=['GET'])
+def restrictions():
+    # TODO json w/ max filesize, allow anonymous, max anon filesize, list of supported mime types
+    return ""
 
 
 @app.route('/api/upload', methods=['PUT'])
@@ -50,7 +57,7 @@ def put_upload():
             response.url = filename
 
             from lmda.models import File, User
-            if current_user.is_anonymous():
+            if current_user.is_anonymous:
                 cur_uid = -1
             else:
                 cur_uid = current_user.id
@@ -61,8 +68,11 @@ def put_upload():
             # SUCCESS !!!
 
             return json.dumps(response, cls=ResponseEncoder)
-        except:
+        except IOError as e:
+            sys.stderr.write(str(e))
+            sys.stderr.write('\n')
             response.errors.append('Error saving file')
+            response.errors.append(str(e))
             return json.dumps(response, cls=ResponseEncoder), 500
     else:
         response.errors.append('No file sent')

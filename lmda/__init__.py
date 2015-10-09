@@ -44,10 +44,12 @@ sjcl = Bundle('src/js/sjcl.js', output='js/sjcl.js')
 all_js = Bundle('src/coffee/all.coffee', filters='coffeescript', output='js/all.js')
 paste_js = Bundle('src/coffee/paste.coffee', filters='coffeescript', output='js/paste.js')
 login_js = Bundle('src/coffee/login.coffee', filters='coffeescript', output='js/login.js')
+upload_js = Bundle('src/coffee/upload.coffee', filters='coffeescript', output='js/upload.js')
 asset_env.register('codemirror_js', codemirror_js)
 asset_env.register('all_js', all_js)
 asset_env.register('paste_js', paste_js)
 asset_env.register('login_js', login_js)
+asset_env.register('upload_js', upload_js)
 asset_env.register('sjcl', sjcl)
 
 
