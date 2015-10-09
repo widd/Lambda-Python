@@ -57,7 +57,7 @@ createStatusIndicator = (xhr, file) ->
     percent = e.loaded / e.total
     progress.value = percent
 
-    if percent > 1.0
+    if percent >= 1.0
       ongoingSection.removeChild(uploadEl)
   )
 
@@ -69,17 +69,25 @@ onUploadFinish = (response) ->
 
   uploadEl = document.createElement("li")
 
+  uploadEl.onclick = =>
+    window.location = url
+
+
   if isImage(response.file)
     image = document.createElement("img")
     image.src = URL.createObjectURL(response.file)
     uploadEl.appendChild(image)
+
+  contentArea = document.createElement("div")
 
   uploadLink = document.createElement("a")
   uploadLink.href = url
 
   uploadLink.innerHTML = response.file.name
 
-  uploadEl.appendChild(uploadLink)
+  contentArea.appendChild(uploadLink)
+
+  uploadEl.appendChild(contentArea)
 
   finishedSection.appendChild(uploadEl)
 
