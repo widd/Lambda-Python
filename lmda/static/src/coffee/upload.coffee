@@ -2,6 +2,7 @@ uploadUrl = "/api/upload"
 configUrl = "/api/upload/restrictions"
 uploadDomain = "/"
 allowedExtensions = null
+noExtensionTypes = null
 sizeLimit = 20  # MB
 apikey = ""
 
@@ -15,6 +16,7 @@ fetchServerConfig = =>
         uploadDomain = response.upload_domain
         sizeLimit = response.max_filesize_mb
         allowedExtensions = response.allowed_types
+        noExtensionTypes = response.no_extension_types
   xmlHttp.open("GET", configUrl, true)  # true for asynchronous
   xmlHttp.send(null);
 
@@ -137,6 +139,10 @@ isImage = (file) ->
 
 isTypeAllowed = (file) ->
   return getExtension(file) in allowedExtensions
+
+
+shouldOmmitExtension = (file) ->
+  return noExtensionTypes is not null and getExtension(file) in noExtensionTypes
 
 
 getExtension = (file) ->

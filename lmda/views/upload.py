@@ -36,6 +36,7 @@ def restrictions():
     response.max_filesize_mb = app.config['MAX_FILESIZE_MB']
     response.max_anon_filesize_mb = app.config['MAX_ANONYMOUS_FILESIZE_MB']
     response.upload_domain = app.config['UPLOAD_DOMAIN']
+    response.no_extension_types = app.config['NO_EXTENSION_TYPES']
 
     return Response(json.dumps(response, cls=ResponseEncoder), mimetype='application/json')
 
@@ -63,6 +64,8 @@ def put_upload():
         try:
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename + '.' + extension))
             response.url = filename
+            if extension not in app.config['NO_EXTENSION_TYPES']:
+                response.url += '.' + extension
 
             from lmda.models import File, User
             if current_user.is_anonymous:
