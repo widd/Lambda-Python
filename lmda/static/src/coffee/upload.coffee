@@ -1,7 +1,7 @@
 uploadUrl = "/api/upload"
 configUrl = "/api/upload/restrictions"
 uploadDomain = "/"
-allowedExtensions = []
+allowedExtensions = null
 sizeLimit = 20  # MB
 apikey = ""
 
@@ -20,7 +20,7 @@ fetchServerConfig = =>
 
 
 checkAndUpload = (file) ->
-  if not isTypeAllowed(file)
+  if allowedExtensions != null && not isTypeAllowed(file)
     alert('Filetype "' + getExtension(file) + '" is not supported')
     return
   if file.size > sizeLimit*1000000

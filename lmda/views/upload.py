@@ -51,7 +51,7 @@ def put_upload():
             return json.dumps(response, cls=ResponseEncoder), 400
 
         extension = extension_split[-1]
-        extension_allowed = extension in app.config['ALLOWED_TYPES']
+        extension_allowed = app.config.get('ALLOWED_TYPES', None) is None or extension in app.config['ALLOWED_TYPES']
         if not extension_allowed:
             response.errors.append('Extension not allowed: ' + extension)
 
@@ -104,10 +104,14 @@ def gen_filename(max_tries=5, start_length=3, tries_per_len_incr=3):
             tries += 1
             continue
 
-        for extension in app.config['ALLOWED_TYPES']:
-            if os.path.isfile(path + '.' + extension):  # file exists
-                tries += 1
-                continue
+        if app.config.get('ALLOWED_TYPES', None) is not None:
+            for extension in app.config['ALLOWED_TYPES']:
+                if os.path.isfile(path + '.' + extension):  # file exists
+                    tries += 1
+                    continue
+        else:
+            if os.path.isfile(path):
+                return None
 
         return filename
 
