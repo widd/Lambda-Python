@@ -1,7 +1,29 @@
+import json
 import os
-from flask import send_from_directory
+from flask import send_from_directory, Response, request
+from flask.ext.login import current_user
 from lmda import app
 from lmda.views import paste
+
+
+class JsonResponse:
+    def __init__(self):
+        self.errors = []
+
+class PastUpload:
+    def __init__(self, id, name, local_name, extension):
+        self.id = id
+        self.name = name
+        self.local_name = local_name
+        self.extension = extension
+
+
+class ResponseEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, (list, dict, str, int, float, bool, type(None))):
+            return json.JSONEncoder.default(self, obj)
+        values = obj.__dict__
+        return values
 
 
 @app.route('/<name>', methods=['GET'])
@@ -18,3 +40,30 @@ def view_image(name):
     # TODO Serve with MIME type header of the extension of the file, to prevent uploading of not-allowed files with a fake extension
 
     return paste.view_paste(name)
+
+
+@app.route('/api/user/uploads')
+def view_uploads():
+    # TODO API key support
+
+    n = int(request.args.get('n', 10))
+    page_num = int(request.args.get('page', 1))
+
+    n = max(min(n, 50), 1)  # Clamp n between 1 and 50
+
+    response = JsonResponse()
+    if not current_user.is_anonymous:
+        from lmda.models import File
+
+        files = []
+        pagination = File.query.filter(File.owner == current_user.id).paginate(page=page_num, per_page=n).items
+
+        for f in pagination:
+            pu = PastUpload(f.id, f.name, f.local_name, f.extension)
+            files.append(pu)
+
+        response.files = files
+        return Response(json.dumps(response, cls=ResponseEncoder), mimetype='application/json')
+    else:
+        response.errors = ['Not signed in']
+        return Response(json.dumps(response, cls=ResponseEncoder), status=400, mimetype='application/json')
