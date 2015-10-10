@@ -1,11 +1,17 @@
 import json
+import os
 from flask import Flask
 from flask.ext import assets
 from flask.ext.login import LoginManager
+from flask.ext.sqlalchemy import SQLAlchemy
 from webassets import Bundle
 from webassets.filter import get_filter
 
 app = Flask(__name__)
+
+_script_dir = os.path.dirname(os.path.realpath(__file__))
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + _script_dir + '/dev.db'
+
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['ALLOWED_TYPES'] = ['png', 'jpg', 'jpeg']
 app.config['NO_EXTENSION_TYPES'] = app.config['ALLOWED_TYPES']
@@ -16,6 +22,7 @@ app.config['MAX_ANONYMOUS_FILESIZE_MB'] = 6
 app.config['UPLOAD_DOMAIN'] = "/"
 app.config['SECRET_KEY'] = 'SUPER_SECRET'
 
+db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 
 

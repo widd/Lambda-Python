@@ -1,68 +1,67 @@
 from flask.ext.login import UserMixin
-from sqlalchemy import Integer, Column, String, DateTime, Boolean, func
 from sqlalchemy.ext.declarative import declarative_base
-from lmda import database
+from lmda import db
 
 Base = declarative_base()
 
 
-class User(Base, UserMixin):
+class User(db.Model, UserMixin):
     __tablename__ = 'users'
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    username = Column(String, nullable=False, unique=True)
-    password = Column(String, nullable=False)
-    creation_date = Column(DateTime, nullable=False)
-    api_key = Column(String, nullable=False, unique=True)
-    encryption_enabled = Column(Boolean, nullable=False, default=False)
-    theme_name = Column(String, nullable=False, default='Material')
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    username = db.Column(db.String, nullable=False, unique=True)
+    password = db.Column(db.String, nullable=False)
+    creation_date = db.Column(db.DateTime, nullable=False)
+    api_key = db.Column(db.String, nullable=False, unique=True)
+    encryption_enabled = db.Column(db.Boolean, nullable=False, default=False)
+    theme_name = db.Column(db.String, nullable=False, default='Material')
 
     @staticmethod
     def by_name(username):
-        return database.session.query(User).filter(func.lower(User.username) == func.lower(username)).first()
+        return User.query.filter(db.func.lower(User.username) == db.func.lower(username)).first()
 
     @staticmethod
     def by_id(id):
-        return database.session.query(User).filter(User.id == id).first()
+        return User.query.filter(User.id == id).first()
 
     @staticmethod
     def by_api_key(key):
-        return database.session.query(User).filter(User.api_key == key).first()
+        return User.query.filter(User.api_key == key).first()
 
 
-class File(Base):
+class File(db.Model):
     __tablename__ = 'files'
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    owner = Column(Integer)
-    name = Column(String, nullable=False, unique=True)
-    extension = Column(String, nullable=False)
-    encrypted = Column(Boolean, nullable=False, default=False)
-    local_name = Column(String)
-    upload_date = Column(DateTime)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    owner = db.Column(db.Integer)
+    name = db.Column(db.String, nullable=False, unique=True)
+    extension = db.Column(db.String, nullable=False)
+    encrypted = db.Column(db.Boolean, nullable=False, default=False)
+    local_name = db.Column(db.String)
+    upload_date = db.Column(db.DateTime)
 
     @staticmethod
     def by_name(name):
         # Strip off extension
         name = name.rsplit('.', 1)[0]
 
-        return database.session.query(File).filter(File.name == name).first()
+        return File.query.filter(File.name == name).first()
 
     @staticmethod
     def for_user(id):
-        return database.session.query(File).filter(File.owner == id)
+        return File.query.filter(File.owner == id)
 
 
-class Paste(Base):
+class Paste(db.Model):
     __tablename__ = 'pastes'
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    owner = Column(Integer)
-    name = Column(String, nullable=False, unique=True)
-    content_json = Column(String, nullable=False)
-    is_code = Column(Boolean, nullable=False)
-    upload_date = Column(DateTime)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    owner = db.Column(db.Integer)
+    name = db.Column(db.String, nullable=False, unique=True)
+    content_json = db.Column(db.String, nullable=False)
+    is_code = db.Column(db.Boolean, nullable=False)
+    upload_date = db.Column(db.DateTime)
 
     @staticmethod
     def by_name(name):
-        return database.session.query(Paste).filter(Paste.name == name).first()
+        return Paste.query.filter(Paste.name == name).first()

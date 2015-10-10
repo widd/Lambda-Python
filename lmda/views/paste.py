@@ -2,7 +2,7 @@ import datetime
 import json
 from flask import render_template, request, Response, abort
 from flask.ext.login import current_user
-from lmda import app, ResponseEncoder, database
+from lmda import app, ResponseEncoder, db
 from lmda.models import Paste
 from lmda.views.upload import gen_filename
 
@@ -62,8 +62,8 @@ def put_paste():
     filename = gen_filename()
 
     paste = Paste(name=filename, owner=uploader_id, content_json=paste_text, is_code=(1 if is_code else 0), upload_date=datetime.datetime.utcnow())
-    database.session.add(paste)
-    database.session.commit()
+    db.session.add(paste)
+    db.session.commit()
 
     response.url = filename
     return Response(json.dumps(response, cls=ResponseEncoder), mimetype='application/json')

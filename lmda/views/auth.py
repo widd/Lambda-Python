@@ -5,7 +5,7 @@ import string
 from flask import request, render_template, Response
 from flask.ext.login import login_user, current_user, logout_user
 from passlib.context import CryptContext
-from lmda import app, database, ResponseEncoder
+from lmda import app, ResponseEncoder, db
 
 pwd_context = CryptContext(
     schemes=["pbkdf2_sha256"],
@@ -117,8 +117,8 @@ def create_user():
     from lmda.models import User
     user = User(username=username, password=pass_hash, creation_date=datetime.datetime.utcnow(), api_key=api_key,
                 encryption_enabled=False)
-    database.session.add(user)
-    database.session.commit()
+    db.session.add(user)
+    db.session.commit()
 
     login_user(user)
 

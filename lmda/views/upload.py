@@ -5,7 +5,7 @@ import string
 from flask import render_template, request, Response
 from flask.ext.login import current_user
 import sys
-from lmda import app, database
+from lmda import app, db
 
 
 class UploadResponse:
@@ -72,8 +72,8 @@ def put_upload():
             else:
                 cur_uid = current_user.id
             file = File(owner=cur_uid, name=filename, extension=extension, encrypted=False, local_name=file.filename)
-            database.session.add(file)
-            database.session.commit()
+            db.session.add(file)
+            db.session.commit()
 
             # SUCCESS !!!
 
