@@ -6,11 +6,13 @@ getUploads = =>
         uploads = document.getElementById('uploads')
         for upload in response.files
           li = document.createElement('li')
+          li.title = upload.local_name
           a = document.createElement('a')
           a.href = '/' + upload.name  # TODO use link url config
                                       # TODO use extension-keeping config
           img = document.createElement('img')
           img.src = '/' + upload.name + '.' + upload.extension
+          img.alt = upload.local_name
           a.appendChild(img)
           li.appendChild(a)
           uploads.appendChild(li)
