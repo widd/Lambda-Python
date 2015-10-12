@@ -1,4 +1,5 @@
 import json
+from multiprocessing.pool import Pool
 import os
 from flask import Flask
 from flask.ext import assets
@@ -6,6 +7,8 @@ from flask.ext.login import LoginManager
 from flask.ext.sqlalchemy import SQLAlchemy
 from webassets import Bundle
 from webassets.filter import get_filter
+
+thumbnail_process_pool = Pool(2)
 
 app = Flask(__name__)
 

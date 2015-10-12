@@ -5,7 +5,9 @@ import string
 from flask import render_template, request, Response
 from flask.ext.login import current_user
 import sys
-from lmda import app, db
+from lmda import app, db, thumbnail_process_pool
+from lmda.models import Thumbnail
+from thumnail_create import create_thumbnail
 
 
 class UploadResponse:
@@ -61,7 +63,9 @@ def put_upload():
             return json.dumps(response, cls=ResponseEncoder), 500
 
         try:
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename + '.' + extension))
+            relative_filename = os.path.join(app.config['UPLOAD_FOLDER'], filename + '.' + extension)
+            absolute_filename = os.path.abspath(relative_filename)
+            file.save(relative_filename)
             response.url = filename
             if extension not in app.config['NO_EXTENSION_TYPES']:
                 response.url += '.' + extension
@@ -71,11 +75,21 @@ def put_upload():
                 cur_uid = -1
             else:
                 cur_uid = current_user.id
-            file = File(owner=cur_uid, name=filename, extension=extension, encrypted=False, local_name=file.filename)
+            file = File(owner=cur_uid, name=filename, extension=extension, encrypted=False, local_name=file.filename,
+                        has_thumbnail=False)
             db.session.add(file)
             db.session.commit()
 
             # SUCCESS !!!
+
+            # Create thumbnail
+            if extension in app.config['THUMBNAIL_TYPES']:
+                from lmda.models import Thumbnail
+                thumbnail_process_pool.apply_async(
+                    create_thumbnail,
+                    args=(absolute_filename, filename),
+                    callback=add_thumbnail
+                )
 
             return json.dumps(response, cls=ResponseEncoder)
         except IOError as e:
@@ -116,3 +130,18 @@ def gen_filename(max_tries=5, start_length=3, tries_per_len_incr=3):
                 return None
 
         return filename
+
+
+def add_thumbnail(result):
+    if result is not False:
+        outname, name, width, height = result
+
+        from lmda.models import File
+
+        thumbnail = Thumbnail(parent_name=name, width=width, height=height, url=outname)
+        file = File.by_name(name)
+        file.has_thumbnail = True
+        db.session.add(thumbnail)
+        db.session.commit()
+
+db.create_all()

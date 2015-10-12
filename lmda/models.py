@@ -39,6 +39,7 @@ class File(db.Model):
     encrypted = db.Column(db.Boolean, nullable=False, default=False)
     local_name = db.Column(db.String)
     upload_date = db.Column(db.DateTime)
+    has_thumbnail = db.Column(db.Boolean, nullable=False, default=False)
 
     @staticmethod
     def by_name(name):
@@ -65,3 +66,17 @@ class Paste(db.Model):
     @staticmethod
     def by_name(name):
         return Paste.query.filter(Paste.name == name).first()
+
+
+class Thumbnail(db.Model):
+    __tablename__ = 'thumbnails'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    parent_name = db.Column(db.String, nullable=False, unique=True)
+    width = db.Column(db.Integer, nullable=False)
+    height = db.Column(db.Integer, nullable=False)
+    url = db.Column(db.String, nullable=False)
+
+    @staticmethod
+    def by_parent(name):
+        return Thumbnail.query.filter(Thumbnail.parent_name == name).all()
