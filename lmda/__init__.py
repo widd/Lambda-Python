@@ -12,14 +12,43 @@ app = Flask(__name__)
 _script_dir = os.path.dirname(os.path.realpath(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + _script_dir + '/dev.db'
 
+# Relative path of where to put uploads
 app.config['UPLOAD_FOLDER'] = 'uploads'
+# Extensions that are allowed as uploads
 app.config['ALLOWED_TYPES'] = ['png', 'jpg', 'jpeg']
-app.config['NO_EXTENSION_TYPES'] = app.config['ALLOWED_TYPES']
+# Extensions to omit the extension of when linking
+app.config['NO_EXTENSION_TYPES'] = ['png', 'jpg', 'jpeg']
+# Types to attempt to make a thumbnail for
+app.config['THUMBNAIL_TYPES'] = ['png', 'jpg', 'jpeg']
+# Images to use in replacement of a thumbnail for types
+app.config['GENERIC_IMAGES'] = {
+    'png': '/static/img/generic/image.svg',
+    'jpg': '/static/img/generic/image.svg',
+    'jpeg': '/static/img/generic/image.svg',
+    'tiff': '/static/img/generic/image.svg',
+    'webp': '/static/img/generic/image.svg',
+    'mp4': '/static/img/generic/video.svg',
+    'webm': '/static/img/generic/video.svg',
+    'avi': '/static/img/generic/video.svg',
+    'm4v': '/static/img/generic/video.svg',
+    'm4a': '/static/img/generic/audio.svg',
+    'opus': '/static/img/generic/audio.svg',
+    'ogg': '/static/img/generic/audio.svg',
+    'mp3': '/static/img/generic/audio.svg',
+}
+# Generic image used for an extension that doesn't have another generic image
+app.config['ULTIMATE_GENERIC_IMAGE'] = '/static/img/generic/generic.svg'
+# Whether to allow uploading as an anonymous user
 app.config['ANONYMOUS_UPLOAD'] = True
+# Whether to allow pasting as an anonymous user
 app.config['ANONYMOUS_PASTE'] = True
+# Maximum filesize (in MB) for an upload by an authenticated user
 app.config['MAX_FILESIZE_MB'] = 20
+# Maximum filsize (in MB) for an upload by an anonymous user
 app.config['MAX_ANONYMOUS_FILESIZE_MB'] = 6
+# What to prepend links to uploads with
 app.config['UPLOAD_DOMAIN'] = "/"
+# Secret key used for sessions and stuff
 app.config['SECRET_KEY'] = 'SUPER_SECRET'
 
 db = SQLAlchemy(app)
