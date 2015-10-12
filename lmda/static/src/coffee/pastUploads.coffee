@@ -1,9 +1,37 @@
+page = 1
+perPage = 21
+
+numPages = 1
+
 getUploads = =>
+  specified_page = window.location.hash.substr(1)
+  if specified_page.length > 0
+    page = specified_page
+
+  uploads = document.getElementById('uploads')
+  uploads.innerHTML = ""
+
   xmlHttp = new XMLHttpRequest()
   xmlHttp.onreadystatechange = =>
     if xmlHttp.readyState == 4 && xmlHttp.status == 200
         response = JSON.parse(xmlHttp.responseText)
-        uploads = document.getElementById('uploads')
+
+        numPages = response.number_pages
+        pageNum = document.getElementById("pageNum")
+        pageNum.innerHTML = "Page #{page} of #{numPages}"
+
+        goBackBtn = document.getElementById("goBack")
+        if page > 1
+          goBackBtn.className = "navButton"
+        else
+          goBackBtn.className = "navButton hidden"
+
+        goFwdBtn = document.getElementById("goNext")
+        if page < numPages
+          goFwdBtn.className = "navButton"
+        else
+          goFwdBtn.className = "navButton hidden"
+
         for upload in response.files
           li = document.createElement('li')
           li.title = upload.local_name
@@ -16,9 +44,21 @@ getUploads = =>
           a.appendChild(img)
           li.appendChild(a)
           uploads.appendChild(li)
-  xmlHttp.open("GET", "/api/user/uploads?page=1&n=20", true)  # true for asynchronous
+  xmlHttp.open("GET", "/api/user/uploads?page=#{page}&n=#{perPage}", true)  # true for asynchronous
   xmlHttp.send(null);
 
 document.addEventListener("DOMContentLoaded", =>
   getUploads()
+
+  window.addEventListener('hashchange', =>
+    getUploads()
+  )
 )
+
+prevPage = =>
+  page = parseInt(page) - 1
+  window.location.hash = page
+
+nextPage = =>
+  page = parseInt(page) + 1
+  window.location.hash = page

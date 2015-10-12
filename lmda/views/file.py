@@ -56,13 +56,14 @@ def get_past_uploads():
         from lmda.models import File
 
         files = []
-        pagination = File.query.filter(File.owner == current_user.id).order_by(File.id.desc()).paginate(page=page_num, per_page=n).items
+        pagination = File.query.filter(File.owner == current_user.id).order_by(File.id.desc()).paginate(page=page_num, per_page=n)
 
-        for f in pagination:
+        for f in pagination.items:
             pu = PastUpload(f.id, f.name, f.local_name, f.extension)
             files.append(pu)
 
         response.files = files
+        response.number_pages = pagination.pages
         return Response(json.dumps(response, cls=ResponseEncoder), mimetype='application/json')
     else:
         response.errors = ['Not signed in']
