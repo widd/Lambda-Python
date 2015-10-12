@@ -41,6 +41,14 @@ getUploads = =>
           a.href = '/' + upload.name  # TODO use link url config
                                       # TODO use extension-keeping config
           img = document.createElement('img')
+
+          img.onerror = (e) ->  # If the image failed to load
+            if not e.target.erroredBefore
+              e.target.erroredBefore = true  # Prevent endless loop of loading the replacement image if the replacement image also fails
+
+              # TODO choose the appropriate replacement image for the extension type
+              e.target.src = ""
+
           img.src = '/' + upload.name + '.' + upload.extension
           img.alt = upload.local_name
           a.appendChild(img)
