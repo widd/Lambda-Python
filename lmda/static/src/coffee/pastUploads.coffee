@@ -46,6 +46,11 @@ getUploads = =>
           a.appendChild(img)
           li.appendChild(a)
           uploads.appendChild(li)
+    else if xmlHttp.readyState == 4  # an error occurred
+      response = JSON.parse(xmlHttp.responseText)
+      for error in response.errors
+        if error == "Not signed in"
+          window.location.href = "/login"
 
   reqUrl = "/api/user/uploads?page=#{page}&n=#{perPage}"
   if searchText != null
