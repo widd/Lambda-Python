@@ -3,6 +3,7 @@ import os
 from flask import send_from_directory, Response, request, render_template
 from flask.ext.login import current_user
 from lmda import app
+from lmda.models import Thumbnail
 from lmda.views import paste
 
 
@@ -11,11 +12,20 @@ class JsonResponse:
         self.errors = []
 
 class PastUpload:
-    def __init__(self, id, name, local_name, extension):
+    def __init__(self, id, name, local_name, extension, has_thumb):
         self.id = id
         self.name = name
         self.local_name = local_name
         self.extension = extension
+        self.has_thumb = has_thumb
+
+
+class ReturnThumbnail:
+    def __init__(self, url, parent, width, height):
+        self.url = url
+        self.width = width
+        self.height = height
+        self.parent = parent
 
 
 class ResponseEncoder(json.JSONEncoder):
@@ -42,6 +52,17 @@ def view_image(name):
     return paste.view_paste(name)
 
 
+@app.route('/api/file/thumbnails/<name>')
+def get_thumbnails(name):
+    response = JsonResponse()
+
+    response.thumbnails = []
+    for t in Thumbnail.by_parent(name):
+        response.thumbnails.append(ReturnThumbnail(t.url, t.parent_name, t.width, t.height))
+
+    return Response(json.dumps(response, cls=ResponseEncoder), mimetype='application/json')
+
+
 @app.route('/api/user/uploads')
 def get_past_uploads():
     # TODO API key support
@@ -64,7 +85,7 @@ def get_past_uploads():
 
         files = []
         for f in pagination.items:
-            pu = PastUpload(f.id, f.name, f.local_name, f.extension)
+            pu = PastUpload(f.id, f.name, f.local_name, f.extension, f.has_thumbnail)
             files.append(pu)
 
         response.files = files

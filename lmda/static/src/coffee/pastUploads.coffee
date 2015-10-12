@@ -38,7 +38,7 @@ getUploads = =>
           li = document.createElement('li')
           li.title = upload.local_name
           a = document.createElement('a')
-          a.href = '/' + upload.name  # TODO use link url config
+          a.href = '/' + upload.name  # TODO use link url `fig
                                       # TODO use extension-keeping config
           img = document.createElement('img')
 
@@ -49,7 +49,11 @@ getUploads = =>
               # TODO choose the appropriate replacement image for the extension type
               e.target.src = ""
 
-          img.src = '/' + upload.name + '.' + upload.extension
+          if upload.has_thumb
+            setThumb(img, upload.name)
+          else
+            img.src = '/' + upload.name + '.' + upload.extension
+
           img.alt = upload.local_name
           a.appendChild(img)
           li.appendChild(a)
@@ -73,6 +77,16 @@ document.addEventListener("DOMContentLoaded", =>
     getUploads()
   )
 )
+
+setThumb = (img, name) ->
+  thumbReq = new XMLHttpRequest()
+  thumbReq.onreadystatechange = =>
+    if thumbReq.readyState == 4 && thumbReq.status == 200
+      response = JSON.parse(thumbReq.responseText)
+      img.src = response.thumbnails[0].url
+
+  thumbReq.open("GET", "/api/file/thumbnails/#{name}", true)
+  thumbReq.send(null)
 
 prevPage = =>
   page = parseInt(page) - 1
