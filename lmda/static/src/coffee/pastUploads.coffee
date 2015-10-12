@@ -3,6 +3,8 @@ perPage = 21
 
 numPages = 1
 
+searchText = null
+
 getUploads = =>
   specified_page = window.location.hash.substr(1)
   if specified_page.length > 0
@@ -44,7 +46,11 @@ getUploads = =>
           a.appendChild(img)
           li.appendChild(a)
           uploads.appendChild(li)
-  xmlHttp.open("GET", "/api/user/uploads?page=#{page}&n=#{perPage}", true)  # true for asynchronous
+
+  reqUrl = "/api/user/uploads?page=#{page}&n=#{perPage}"
+  if searchText != null
+    reqUrl += "&nameContains=" + encodeURIComponent(searchText)
+  xmlHttp.open("GET", reqUrl, true)  # true for asynchronous
   xmlHttp.send(null);
 
 document.addEventListener("DOMContentLoaded", =>

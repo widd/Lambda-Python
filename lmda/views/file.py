@@ -48,6 +48,7 @@ def get_past_uploads():
 
     n = int(request.args.get('n', 10))
     page_num = int(request.args.get('page', 1))
+    searchText = request.args.get('nameContains', None)
 
     n = max(min(n, 50), 1)  # Clamp n between 1 and 50
 
@@ -55,9 +56,13 @@ def get_past_uploads():
     if not current_user.is_anonymous:
         from lmda.models import File
 
-        files = []
-        pagination = File.query.filter(File.owner == current_user.id).order_by(File.id.desc()).paginate(page=page_num, per_page=n)
+        query = File.query.filter(File.owner == current_user.id).order_by(File.id.desc())
+        if searchText is not None:
+            query = query.filter(File.local_name.ilike('%' + searchText + '%'))
 
+        pagination = query.paginate(page=page_num, per_page=n)
+
+        files = []
         for f in pagination.items:
             pu = PastUpload(f.id, f.name, f.local_name, f.extension)
             files.append(pu)
