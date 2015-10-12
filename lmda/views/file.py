@@ -1,6 +1,6 @@
 import json
 import os
-from flask import send_from_directory, Response, request
+from flask import send_from_directory, Response, request, render_template
 from flask.ext.login import current_user
 from lmda import app
 from lmda.views import paste
@@ -43,7 +43,7 @@ def view_image(name):
 
 
 @app.route('/api/user/uploads')
-def view_uploads():
+def get_past_uploads():
     # TODO API key support
 
     n = int(request.args.get('n', 10))
@@ -56,7 +56,7 @@ def view_uploads():
         from lmda.models import File
 
         files = []
-        pagination = File.query.filter(File.owner == current_user.id).paginate(page=page_num, per_page=n).items
+        pagination = File.query.filter(File.owner == current_user.id).order_by(File.id.desc()).paginate(page=page_num, per_page=n).items
 
         for f in pagination:
             pu = PastUpload(f.id, f.name, f.local_name, f.extension)
@@ -67,3 +67,8 @@ def view_uploads():
     else:
         response.errors = ['Not signed in']
         return Response(json.dumps(response, cls=ResponseEncoder), status=400, mimetype='application/json')
+
+
+@app.route('/user/uploads')
+def view_past_uploads():
+    return render_template('pastUploads.html')
