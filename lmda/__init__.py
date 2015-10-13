@@ -18,11 +18,16 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + _script_dir + '/dev.db'
 # Relative path of where to put uploads
 app.config['UPLOAD_FOLDER'] = 'uploads'
 # Extensions that are allowed as uploads
-app.config['ALLOWED_TYPES'] = ['png', 'jpg', 'jpeg', 'pdf', 'webm']
+app.config['ALLOWED_TYPES'] = [
+    'png', 'gif', 'jpg', 'jpeg', 'webp', 'tiff', 'svg',
+    'mp3', 'ogg', 'opus',
+    'mp4', 'webm',
+    'pdf', 'docx', 'pptx', 'xlsx', 'odt', 'ods', 'odt'
+]
 # Extensions to omit the extension of when linking
-app.config['NO_EXTENSION_TYPES'] = ['png', 'jpg', 'jpeg']
+app.config['NO_EXTENSION_TYPES'] = ['png', 'jpg', 'jpeg', 'gif', 'mp3']
 # Types to attempt to make a thumbnail for
-app.config['THUMBNAIL_TYPES'] = ['png', 'jpg', 'jpeg']
+app.config['THUMBNAIL_TYPES'] = ['png', 'jpg', 'jpeg', 'gif']
 # Images to use in replacement of a thumbnail for types
 app.config['GENERIC_IMAGES'] = {
     'png': '/static/img/generic/image.svg',
@@ -47,9 +52,9 @@ app.config['ANONYMOUS_UPLOAD'] = False
 # Whether to allow pasting as an anonymous user
 app.config['ANONYMOUS_PASTE'] = False
 # Maximum filesize (in MB) for an upload by an authenticated user
-app.config['MAX_FILESIZE_MB'] = 1
+app.config['MAX_FILESIZE_MB'] = 20
 # Maximum filsize (in MB) for an upload by an anonymous user
-app.config['MAX_ANONYMOUS_FILESIZE_MB'] = 1
+app.config['MAX_ANONYMOUS_FILESIZE_MB'] = 5
 # What to prepend links to uploads with
 app.config['UPLOAD_DOMAIN'] = "/"
 # Secret key used for sessions and stuff
