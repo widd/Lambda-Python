@@ -58,6 +58,14 @@ getUploads = =>
             a.href += '.' + upload.extension
           img = document.createElement('img')
 
+          img.onload = (e) ->
+            width = e.target.clientWidth
+            height = e.target.clientHeight
+            if height > width
+              e.target.className = "tall"
+            else
+              e.target.className = "wide"
+
           img.onerror = (e) ->  # If the image failed to load
             if not e.target.erroredBefore
               e.target.erroredBefore = true  # Prevent endless loop of loading the replacement image if the replacement image also fails
