@@ -144,6 +144,8 @@ def legacy_upload():  # LEGACY, DO NOT USE, WILL BE REMOVED SOON
 
 @app.route('/api/upload', methods=['PUT'])
 def put_upload():
+    api_key = request.form.get('api_key')
+
     response = UploadResponse()
     file = request.files['file']
     if file:
@@ -162,6 +164,21 @@ def put_upload():
             response.errors.append('Error generating filename')
             return Response(json.dumps(response, cls=ResponseEncoder), status=500, mimetype='application/json')
 
+        user = current_user
+
+        if user.is_anonymous and api_key is not None:
+            from lmda.models import User
+            user = User.by_api_key(api_key)
+
+        if user is None or user.is_anonymous:
+            if not app.config["ANONYMOUS_UPLOAD"]:
+                response.errors.append('You must be signed in')
+                return Response(json.dumps(response, cls=ResponseEncoder), status=400, mimetype='application/json')
+
+            cur_uid = -1
+        else:
+            cur_uid = user.id
+
         try:
             relative_filename = os.path.join(app.config['UPLOAD_FOLDER'], filename + '.' + extension)
             absolute_filename = os.path.abspath(relative_filename)
@@ -170,10 +187,9 @@ def put_upload():
             if extension not in app.config['NO_EXTENSION_TYPES']:
                 response.url += '.' + extension
 
-            # TODO use API key for user
             if file.content_length > app.config['MAX_FILESIZE_MB']*1000000 or \
-                    (current_user.is_anonymous and file.content_length > app.config['MAX_ANONYMOUS_FILESIZE_MB']*1000000):
-                if current_user.is_anonymous:
+                    ((user is None or user.is_anonymous) and file.content_length > app.config['MAX_ANONYMOUS_FILESIZE_MB']*1000000):
+                if user is None or user.is_anonymous:
                     response.errors.append('Filesize ' + str(file.content_length/1000000) + ' > ' + app.config['MAX_ANONYMOUS_FILESIZE_MB'] + ' MB')
                 else:
                     response.errors.append('Filesize ' + str(file.content_length/1000000) + ' > ' + app.config['MAX_FILESIZE_MB'] + ' MB')
@@ -183,22 +199,14 @@ def put_upload():
             file.seek(0, os.SEEK_END)
             file_length = file.tell()
             if file_length > app.config['MAX_FILESIZE_MB']*1000000 or \
-                    (current_user.is_anonymous and file_length > app.config['MAX_ANONYMOUS_FILESIZE_MB']*1000000):
-                if current_user.is_anonymous:
+                    ((user is None or user.is_anonymous) and file_length > app.config['MAX_ANONYMOUS_FILESIZE_MB']*1000000):
+                if user is None or user.is_anonymous:
                     response.errors.append('Filesize ' + str(file_length/1000000) + ' > ' + app.config['MAX_ANONYMOUS_FILESIZE_MB'] + ' MB')
                 else:
                     response.errors.append('Filesize ' + str(file_length/1000000) + ' > ' + app.config['MAX_FILESIZE_MB'] + ' MB')
                 return Response(json.dumps(response, cls=ResponseEncoder), status=400, mimetype='application/json')
 
-            from lmda.models import File, User
-            if current_user.is_anonymous:
-                if not app.config["ANONYMOUS_UPLOAD"]:
-                    response.errors.append('You must be signed in')
-                    return Response(json.dumps(response, cls=ResponseEncoder), status=400, mimetype='application/json')
-
-                cur_uid = -1
-            else:
-                cur_uid = current_user.id
+            from lmda.models import File
             file = File(owner=cur_uid, name=filename, extension=extension, encrypted=False, local_name=file.filename,
                         has_thumbnail=False)
             db.session.add(file)
@@ -207,7 +215,7 @@ def put_upload():
             # SUCCESS !!!
 
             # Create thumbnail
-            if not current_user.is_anonymous and extension in app.config['THUMBNAIL_TYPES']:
+            if not (user is None or user.is_anonymous) and extension in app.config['THUMBNAIL_TYPES']:
                 from lmda.models import Thumbnail
                 thumbnail_process_pool.apply_async(
                     create_thumbnail,
