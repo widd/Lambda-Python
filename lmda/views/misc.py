@@ -1,4 +1,5 @@
-from flask import render_template
+import os
+from flask import render_template, send_file
 from lmda import app
 
 
@@ -10,6 +11,12 @@ def index():
 @app.route('/about')
 def about():
     return render_template('about.html')
+
+
+@app.route('/generic/by-ext/<extension>')
+def generic_by_ext(extension):
+    generic_path = app.config['GENERIC_IMAGES'].get(extension, app.config['ULTIMATE_GENERIC_IMAGE'])
+    return send_file(os.getcwd() + '/lmda' + generic_path)
 
 
 @app.errorhandler(404)

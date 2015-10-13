@@ -18,7 +18,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + _script_dir + '/dev.db'
 # Relative path of where to put uploads
 app.config['UPLOAD_FOLDER'] = 'uploads'
 # Extensions that are allowed as uploads
-app.config['ALLOWED_TYPES'] = ['png', 'jpg', 'jpeg']
+app.config['ALLOWED_TYPES'] = ['png', 'jpg', 'jpeg', 'pdf', 'webm']
 # Extensions to omit the extension of when linking
 app.config['NO_EXTENSION_TYPES'] = ['png', 'jpg', 'jpeg']
 # Types to attempt to make a thumbnail for
@@ -30,6 +30,7 @@ app.config['GENERIC_IMAGES'] = {
     'jpeg': '/static/img/generic/image.svg',
     'tiff': '/static/img/generic/image.svg',
     'webp': '/static/img/generic/image.svg',
+    'svg': '/static/img/generic/image.svg',
     'mp4': '/static/img/generic/video.svg',
     'webm': '/static/img/generic/video.svg',
     'avi': '/static/img/generic/video.svg',

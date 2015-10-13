@@ -47,7 +47,8 @@ getUploads = =>
               e.target.erroredBefore = true  # Prevent endless loop of loading the replacement image if the replacement image also fails
 
               # TODO choose the appropriate replacement image for the extension type
-              e.target.src = ""
+              extension = e.target.src.split('.').pop()
+              e.target.src = "/generic/by-ext/#{extension}"
 
           if upload.has_thumb
             setThumb(img, upload.name)
