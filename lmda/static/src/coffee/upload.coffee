@@ -9,8 +9,6 @@ apikey = ""
 anonUpload = true
 
 fetchServerConfig = =>
-  # TODO care about the anonymous stuff
-
   xmlHttp = new XMLHttpRequest()
   xmlHttp.onreadystatechange = =>
     if xmlHttp.readyState == 4 && xmlHttp.status == 200
