@@ -9,8 +9,6 @@ from lmda import app, db, thumbnail_process_pool
 from lmda.models import Thumbnail, Paste
 from thumnail_create import create_thumbnail
 
-# TODO use application/json mimetype everywhere that json is returned
-
 
 class UploadResponse:
     def __init__(self):
