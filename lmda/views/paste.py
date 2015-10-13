@@ -10,6 +10,7 @@ from lmda.views.upload import gen_filename
 class EmptyClass:
     pass
 
+
 @app.route('/paste', methods=['GET'])
 def paste():
     return render_template('paste.html')

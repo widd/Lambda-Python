@@ -152,7 +152,7 @@ def put_upload():
         extension_split = file.filename.split('.')
         if len(extension_split) < 1:
             response.errors.append('File is missing extension. Name was ' + file.filename + '.')
-            return json.dumps(response, cls=ResponseEncoder), 400
+            return Response(json.dumps(response, cls=ResponseEncoder), status=400, mimetype='application/json')
 
         extension = extension_split[-1]
         extension_allowed = app.config.get('ALLOWED_TYPES', None) is None or extension in app.config['ALLOWED_TYPES']
@@ -162,7 +162,7 @@ def put_upload():
         filename = gen_filename()
         if filename is None:
             response.errors.append('Error generating filename')
-            return json.dumps(response, cls=ResponseEncoder), 500
+            return Response(json.dumps(response, cls=ResponseEncoder), status=500, mimetype='application/json')
 
         try:
             relative_filename = os.path.join(app.config['UPLOAD_FOLDER'], filename + '.' + extension)
@@ -179,7 +179,7 @@ def put_upload():
                     response.errors.append('Filesize ' + str(file.content_length/1000000) + ' > ' + app.config['MAX_ANONYMOUS_FILESIZE_MB'] + ' MB')
                 else:
                     response.errors.append('Filesize ' + str(file.content_length/1000000) + ' > ' + app.config['MAX_FILESIZE_MB'] + ' MB')
-                return json.dumps(response, cls=ResponseEncoder), 400
+                return Response(json.dumps(response, cls=ResponseEncoder), status=400, mimetype='application/json')
 
             # Make sure they didn't lie in content_length
             file.seek(0, os.SEEK_END)
@@ -190,13 +190,13 @@ def put_upload():
                     response.errors.append('Filesize ' + str(file_length/1000000) + ' > ' + app.config['MAX_ANONYMOUS_FILESIZE_MB'] + ' MB')
                 else:
                     response.errors.append('Filesize ' + str(file_length/1000000) + ' > ' + app.config['MAX_FILESIZE_MB'] + ' MB')
-                return json.dumps(response, cls=ResponseEncoder), 400
+                return Response(json.dumps(response, cls=ResponseEncoder), status=400, mimetype='application/json')
 
             from lmda.models import File, User
             if current_user.is_anonymous:
                 if not app.config["ANONYMOUS_UPLOAD"]:
                     response.errors.append('You must be signed in')
-                    return json.dumps(response, cls=ResponseEncoder), 400
+                    return Response(json.dumps(response, cls=ResponseEncoder), status=400, mimetype='application/json')
 
                 cur_uid = -1
             else:
@@ -217,16 +217,16 @@ def put_upload():
                     callback=add_thumbnail
                 )
 
-            return json.dumps(response, cls=ResponseEncoder)
+            return Response(json.dumps(response, cls=ResponseEncoder), mimetype='application/json')
         except IOError as e:
             sys.stderr.write(str(e))
             sys.stderr.write('\n')
             response.errors.append('Error saving file')
             response.errors.append(str(e))
-            return json.dumps(response, cls=ResponseEncoder), 500
+            return Response(json.dumps(response, cls=ResponseEncoder), status=500, mimetype='application/json')
     else:
         response.errors.append('No file sent')
-        return json.dumps(response, cls=ResponseEncoder), 400
+        return Response(json.dumps(response, cls=ResponseEncoder), status=400, mimetype='application/json')
 
 
 def gen_filename(max_tries=5, start_length=3, tries_per_len_incr=3):
