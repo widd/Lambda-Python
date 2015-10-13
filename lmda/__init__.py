@@ -66,6 +66,8 @@ app.config['RECAPTCHA_SECRET'] = 'SUPER_SECRET'
 # ReCaptcha public key
 app.config['RECAPTCHA_PUBLIC'] = 'SUPER_SECRET'
 
+app.config.from_envvar('LAMBDA_CONFIG')
+
 # The following lines shouldn't be user-configurable, and are based off of user-configurable options
 app.config['MAX_CONTENT_LENGTH'] = app.config['MAX_FILESIZE_MB'] * 1024 * 1024
 if not app.config['RECAPTCHA_PUBLIC'] or not app.config['RECAPTCHA_SECRET']:
