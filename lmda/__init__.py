@@ -43,17 +43,20 @@ app.config['GENERIC_IMAGES'] = {
 # Generic image used for an extension that doesn't have another generic image
 app.config['ULTIMATE_GENERIC_IMAGE'] = '/static/img/generic/generic.svg'
 # Whether to allow uploading as an anonymous user
-app.config['ANONYMOUS_UPLOAD'] = True
+app.config['ANONYMOUS_UPLOAD'] = False
 # Whether to allow pasting as an anonymous user
-app.config['ANONYMOUS_PASTE'] = True
+app.config['ANONYMOUS_PASTE'] = False
 # Maximum filesize (in MB) for an upload by an authenticated user
-app.config['MAX_FILESIZE_MB'] = 20
+app.config['MAX_FILESIZE_MB'] = 1
 # Maximum filsize (in MB) for an upload by an anonymous user
-app.config['MAX_ANONYMOUS_FILESIZE_MB'] = 6
+app.config['MAX_ANONYMOUS_FILESIZE_MB'] = 1
 # What to prepend links to uploads with
 app.config['UPLOAD_DOMAIN'] = "/"
 # Secret key used for sessions and stuff
 app.config['SECRET_KEY'] = 'SUPER_SECRET'
+
+# This shouldn't be user-configurable, and is based off of user-configurable options
+app.config['MAX_CONTENT_LENGTH'] = app.config['MAX_FILESIZE_MB'] * 1024 * 1024
 
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)

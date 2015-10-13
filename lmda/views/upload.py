@@ -9,6 +9,8 @@ from lmda import app, db, thumbnail_process_pool
 from lmda.models import Thumbnail, Paste
 from thumnail_create import create_thumbnail
 
+# TODO use application/json mimetype everywhere that json is returned
+
 
 class UploadResponse:
     def __init__(self):
@@ -70,8 +72,32 @@ def put_upload():
             if extension not in app.config['NO_EXTENSION_TYPES']:
                 response.url += '.' + extension
 
+            # TODO use API key for user
+            if file.content_length > app.config['MAX_FILESIZE_MB']*1000000 or \
+                    (current_user.is_anonymous and file.content_length > app.config['MAX_ANONYMOUS_FILESIZE_MB']*1000000):
+                if current_user.is_anonymous:
+                    response.errors.append('Filesize ' + str(file.content_length/1000000) + ' > ' + app.config['MAX_ANONYMOUS_FILESIZE_MB'] + ' MB')
+                else:
+                    response.errors.append('Filesize ' + str(file.content_length/1000000) + ' > ' + app.config['MAX_FILESIZE_MB'] + ' MB')
+                return json.dumps(response, cls=ResponseEncoder), 400
+
+            # Make sure they didn't lie in content_length
+            file.seek(0, os.SEEK_END)
+            file_length = file.tell()
+            if file_length > app.config['MAX_FILESIZE_MB']*1000000 or \
+                    (current_user.is_anonymous and file_length > app.config['MAX_ANONYMOUS_FILESIZE_MB']*1000000):
+                if current_user.is_anonymous:
+                    response.errors.append('Filesize ' + str(file_length/1000000) + ' > ' + app.config['MAX_ANONYMOUS_FILESIZE_MB'] + ' MB')
+                else:
+                    response.errors.append('Filesize ' + str(file_length/1000000) + ' > ' + app.config['MAX_FILESIZE_MB'] + ' MB')
+                return json.dumps(response, cls=ResponseEncoder), 400
+
             from lmda.models import File, User
             if current_user.is_anonymous:
+                if not app.config["ANONYMOUS_UPLOAD"]:
+                    response.errors.append('You must be signed in')
+                    return json.dumps(response, cls=ResponseEncoder), 400
+
                 cur_uid = -1
             else:
                 cur_uid = current_user.id

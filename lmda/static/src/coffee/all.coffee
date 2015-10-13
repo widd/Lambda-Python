@@ -1,4 +1,5 @@
 userDropdownDown = false
+username = null
 
 getSessionInfo = (onSuccess, onFail) ->
   request = new XMLHttpRequest()
@@ -34,6 +35,7 @@ setTopbarAuth = =>
     ((userInfo) ->
       topbarAccountArea = document.getElementById("topbar-account")
       topbarAccountArea.innerHTML = userInfo.username
+      username = userInfo.username
       topbarAccountArea.href = "#"
       topbarAccountArea.onclick = toggleUserDropdown
     ),
@@ -42,6 +44,7 @@ setTopbarAuth = =>
       topbarAccountArea.innerHTML = "Not Signed In"
       topbarAccountArea.href = "/login"
       topbarAccountArea.onclick = null
+      username = null
 
       if userDropdownDown
         toggleUserDropdown()

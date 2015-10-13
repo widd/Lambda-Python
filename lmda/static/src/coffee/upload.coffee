@@ -4,7 +4,9 @@ uploadDomain = "/"
 allowedExtensions = null
 noExtensionTypes = null
 sizeLimit = 20  # MB
+anonSizeLimit = sizeLimit
 apikey = ""
+anonUpload = true
 
 fetchServerConfig = =>
   # TODO care about the anonymous stuff
@@ -17,16 +19,29 @@ fetchServerConfig = =>
         sizeLimit = response.max_filesize_mb
         allowedExtensions = response.allowed_types
         noExtensionTypes = response.no_extension_types
+        anonSizeLimit = response.max_anon_filesize_mb
+        anonUpload = response.anonymous_upload
   xmlHttp.open("GET", configUrl, true)  # true for asynchronous
   xmlHttp.send(null);
 
 
 checkAndUpload = (file) ->
-  if allowedExtensions != null && not isTypeAllowed(file)
-    alert('Filetype "' + getExtension(file) + '" is not supported')
+  errorList = document.getElementById("errorList")
+
+  if not anonUpload and username is null
+    li = document.createElement("li")
+    li.innerHTML = 'You must be signed in to upload files'
+    errorList.appendChild(li)
     return
-  if file.size > sizeLimit*1000000
-    alert('File is too large. Max size is ' + sizeLimit + ' MB.')
+  if allowedExtensions != null && not isTypeAllowed(file)
+    li = document.createElement("li")
+    li.innerHTML = 'Filetype "' + getExtension(file) + '" is not supported'
+    errorList.appendChild(li)
+    return
+  if file.size > sizeLimit*1000000 or (username is null and file.size > anonSizeLimit*1000000)
+    li = document.createElement("li")
+    li.innerHTML = 'File is too large. Max size is ' + sizeLimit + ' MB.'
+    errorList.appendChild(li)
     return
   # Nothing failed, continue to upload
   upload(file, onUploadFinish)
