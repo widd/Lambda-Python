@@ -66,6 +66,11 @@ def get_session_info():
     return Response(json.dumps(response, cls=ResponseEncoder), mimetype='application/json')
 
 
+@app.route('/user/manage')
+def manage_user():
+    return render_template('manageAccount.html')
+
+
 @app.route('/api/user/new', methods=['POST'])
 def create_user():
     # TODO captcha

@@ -97,12 +97,14 @@ paste_js = Bundle('src/coffee/paste.coffee', filters='coffeescript', output='js/
 login_js = Bundle('src/coffee/login.coffee', filters='coffeescript', output='js/login.js')
 upload_js = Bundle('src/coffee/upload.coffee', filters='coffeescript', output='js/upload.js')
 past_upload_js = Bundle('src/coffee/pastUploads.coffee', filters='coffeescript', output='js/upload.js')
+manage_account_js = Bundle('src/coffee/manageAccount.coffee', filters='coffeescript', output='js/manageAccount.js')
 asset_env.register('codemirror_js', codemirror_js)
 asset_env.register('all_js', all_js)
 asset_env.register('paste_js', paste_js)
 asset_env.register('login_js', login_js)
 asset_env.register('upload_js', upload_js)
 asset_env.register('past_upload_js', past_upload_js)
+asset_env.register('manage_account_js', manage_account_js)
 asset_env.register('sjcl', sjcl)
 
 

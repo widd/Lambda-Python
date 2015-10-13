@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>λ | Past Uploads</title>
+
+    {% from "_util.html" import import_css %}
+    {{ import_css('main_css') }}
+    {{ import_css('manage_account_css') }}
+
+    {% include "shared_head.html" %}
+</head>
+
+<body>
+<header>
+    {% include "topbar.html" %}
+</header>
+<main class="content">
+    API Key: <span id="apiKey" style="font-weight: bold"></span>
+</main>
+
+{% from "_util.html" import import_js %}
+{{ import_js('all_js') }}
+{{ import_js('manage_account_js') }}
+</body>
+
+</html>
