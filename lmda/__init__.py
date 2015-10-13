@@ -1,4 +1,5 @@
 import json
+import logging
 from multiprocessing.pool import Pool
 import os
 from flask import Flask
@@ -11,6 +12,9 @@ from webassets.filter import get_filter
 thumbnail_process_pool = Pool(2)
 
 app = Flask(__name__)
+
+log = logging.getLogger('werkzeug')
+log.setLevel(logging.ERROR)
 
 _script_dir = os.path.dirname(os.path.realpath(__file__))
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + _script_dir + '/dev.db'
