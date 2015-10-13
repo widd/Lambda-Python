@@ -4,7 +4,7 @@ from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
 
 
-def User(Base):
+class User(Base):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True)
@@ -16,7 +16,7 @@ def User(Base):
     theme_name = Column(String)
 
 
-def File(Base):
+class File(Base):
     __tablename__ = 'files'
 
     id = Column(Integer, primary_key=True)
@@ -28,7 +28,7 @@ def File(Base):
     local_name = Column(String)
 
 
-def Paste(Base):
+class Paste(Base):
     __tablename__ = 'pastes'
 
     id = Column(Integer, primary_key=True)
