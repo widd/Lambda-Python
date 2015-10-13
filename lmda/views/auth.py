@@ -62,8 +62,6 @@ def get_session_info():
     response.username = user.username
     response.api_key = user.api_key
 
-    print(response)
-
     return Response(json.dumps(response, cls=ResponseEncoder), mimetype='application/json')
 
 
@@ -164,7 +162,6 @@ def auth_user():
         response.errors.append('No such user')
         return Response(json.dumps(response, cls=ResponseEncoder), status=400, mimetype='application/json')
 
-    print(user.username)
     if not pwd_context.verify(password, user.password):
         response.errors.append('Wrong password')
         return Response(json.dumps(response, cls=ResponseEncoder), status=400, mimetype='application/json')

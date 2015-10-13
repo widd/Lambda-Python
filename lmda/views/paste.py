@@ -43,8 +43,6 @@ def put_paste():
     paste_text = request.form.get('paste')
     is_code = request.form.get('is_code', False)
 
-    print(request.form)
-
     if paste_text is None:
         response.errors.append("No paste data sent")
         return Response(json.dumps(response, cls=ResponseEncoder), status=400, mimetype='application/json')
