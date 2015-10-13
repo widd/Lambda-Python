@@ -122,7 +122,7 @@ def legacy_upload():  # LEGACY, DO NOT USE, WILL BE REMOVED SOON
             # SUCCESS !!!
 
             # Create thumbnail
-            if not current_user.is_anonymous and extension in app.config['THUMBNAIL_TYPES']:
+            if extension in app.config['THUMBNAIL_TYPES']:
                 from lmda.models import Thumbnail
                 thumbnail_process_pool.apply_async(
                     create_thumbnail,
