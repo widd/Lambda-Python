@@ -74,8 +74,6 @@ def manage_user():
 
 @app.route('/api/user/new', methods=['POST'])
 def create_user():
-    # TODO captcha
-
     response = EmptyClass()
     response.errors = []
 
