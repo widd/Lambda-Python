@@ -109,7 +109,7 @@ def put_upload():
             # SUCCESS !!!
 
             # Create thumbnail
-            if extension in app.config['THUMBNAIL_TYPES']:
+            if not current_user.is_anonymous and extension in app.config['THUMBNAIL_TYPES']:
                 from lmda.models import Thumbnail
                 thumbnail_process_pool.apply_async(
                     create_thumbnail,
