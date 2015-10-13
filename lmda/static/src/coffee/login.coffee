@@ -9,7 +9,6 @@ login = =>
     if request.status == 200
       window.location = "/"
     else
-      # TODO show fancy login failed thing
       try
         response = JSON.parse(request.responseText)
         if response.errors.length > 0

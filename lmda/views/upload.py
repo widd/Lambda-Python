@@ -6,7 +6,7 @@ from flask import render_template, request, Response
 from flask.ext.login import current_user
 import sys
 from lmda import app, db, thumbnail_process_pool
-from lmda.models import Thumbnail
+from lmda.models import Thumbnail, Paste
 from thumnail_create import create_thumbnail
 
 
@@ -104,8 +104,6 @@ def put_upload():
 
 
 def gen_filename(max_tries=5, start_length=3, tries_per_len_incr=3):
-    # TODO check pastes
-
     tries = 0
     while True:
         if tries >= max_tries:
@@ -114,6 +112,11 @@ def gen_filename(max_tries=5, start_length=3, tries_per_len_incr=3):
         extra_length = int(tries/tries_per_len_incr)
 
         filename = ''.join(random.SystemRandom().choice(string.ascii_letters + string.digits) for _ in range(start_length + extra_length))
+
+        if Paste.by_name(filename) is not None:
+            tries += 1
+            continue
+
         path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
 
         if os.path.isfile(path):  # file exists

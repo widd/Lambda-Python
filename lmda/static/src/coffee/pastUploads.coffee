@@ -1,9 +1,24 @@
+configUrl = "/api/upload/restrictions"
+
 page = 1
 perPage = 21
 
 numPages = 1
 
 searchText = null
+
+uploadDomain = "/"
+noExtensionTypes = []
+
+fetchServerConfig = =>
+  xmlHttp = new XMLHttpRequest()
+  xmlHttp.onreadystatechange = =>
+    if xmlHttp.readyState == 4 && xmlHttp.status == 200
+        response = JSON.parse(xmlHttp.responseText)
+        uploadDomain = response.upload_domain
+        noExtensionTypes = response.no_extension_types
+  xmlHttp.open("GET", configUrl, true)  # true for asynchronous
+  xmlHttp.send(null);
 
 getUploads = =>
   specified_page = window.location.hash.substr(1)
@@ -38,15 +53,15 @@ getUploads = =>
           li = document.createElement('li')
           li.title = upload.local_name
           a = document.createElement('a')
-          a.href = '/' + upload.name  # TODO use link url `fig
-                                      # TODO use extension-keeping config
+          a.href = uploadDomain + upload.name
+          if upload.extension not in noExtensionTypes
+            a.href += '.' + upload.extension
           img = document.createElement('img')
 
           img.onerror = (e) ->  # If the image failed to load
             if not e.target.erroredBefore
               e.target.erroredBefore = true  # Prevent endless loop of loading the replacement image if the replacement image also fails
 
-              # TODO choose the appropriate replacement image for the extension type
               extension = e.target.src.split('.').pop()
               e.target.src = "/generic/by-ext/#{extension}"
 
@@ -72,6 +87,8 @@ getUploads = =>
   xmlHttp.send(null);
 
 document.addEventListener("DOMContentLoaded", =>
+  fetchServerConfig()
+
   getUploads()
 
   window.addEventListener('hashchange', =>

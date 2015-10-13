@@ -1,4 +1,5 @@
 import json
+import mimetypes
 import os
 from flask import send_from_directory, Response, request, render_template
 from flask.ext.login import current_user
@@ -43,11 +44,12 @@ def view_image(name):
     if '.' not in name:
         for extension in app.config['ALLOWED_TYPES']:
             if os.path.isfile(path + '.' + extension):  # file exists
-                return send_from_directory(os.getcwd() + '/' + app.config['UPLOAD_FOLDER'], name + '.' + extension)
+                return send_from_directory(os.getcwd() + '/' + app.config['UPLOAD_FOLDER'], name + '.' + extension,
+                                           mimetype=mimetypes.types_map.get('.' + extension, 'application/octet-stream'))
     elif os.path.isfile(path):
-        return send_from_directory(os.getcwd() + '/' + app.config['UPLOAD_FOLDER'], name)
-
-    # TODO Serve with MIME type header of the extension of the file, to prevent uploading of not-allowed files with a fake extension
+        filename, file_extension = os.path.splitext(path)
+        return send_from_directory(os.getcwd() + '/' + app.config['UPLOAD_FOLDER'], name,
+                                   mimetype=mimetypes.types_map.get('.' + file_extension, 'application/octet-stream'))
 
     return paste.view_paste(name)
 
@@ -65,7 +67,7 @@ def get_thumbnails(name):
 
 @app.route('/api/user/uploads')
 def get_past_uploads():
-    # TODO API key support
+    api_key = request.form.get('api_key')
 
     n = int(request.args.get('n', 10))
     page_num = int(request.args.get('page', 1))
@@ -73,11 +75,22 @@ def get_past_uploads():
 
     n = max(min(n, 50), 1)  # Clamp n between 1 and 50
 
+    user = current_user
+
+    if user.is_anonymous and api_key is not None:
+        from lmda.models import User
+        user = User.by_api_key(api_key)
+
     response = JsonResponse()
+
+    if user is None:
+        response.errors = ['Not signed in']
+        return Response(json.dumps(response, cls=ResponseEncoder), status=400, mimetype='application/json')
+
     if not current_user.is_anonymous:
         from lmda.models import File
 
-        query = File.query.filter(File.owner == current_user.id).order_by(File.id.desc())
+        query = File.query.filter(File.owner == user.id).order_by(File.id.desc())
         if searchText is not None:
             query = query.filter(File.local_name.ilike('%' + searchText + '%'))
 
