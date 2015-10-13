@@ -6,6 +6,7 @@ from flask import request, render_template, Response
 from flask.ext.login import login_user, current_user, logout_user
 from passlib.context import CryptContext
 from lmda import app, ResponseEncoder, db
+from lmda.recaptcha import validate_captcha
 
 pwd_context = CryptContext(
     schemes=["pbkdf2_sha256"],
@@ -28,7 +29,7 @@ def login():
 
 @app.route('/register')
 def register():
-    return render_template('register.html')
+    return render_template('register.html', recaptcha_sitekey=app.config['RECAPTCHA_PUBLIC'])
 
 
 @app.route('/api/session', methods=['DELETE'])
@@ -108,6 +109,14 @@ def create_user():
     if len(response.errors) > 0:
         return Response(json.dumps(response, cls=ResponseEncoder), status=400, mimetype='application/json')
     # End input validity checks
+
+    # Check captcha
+    if app.config['RECAPTCHA']:
+        recaptcha_response = request.form.get('g-recaptcha-response')
+        captcha_success = validate_captcha(recaptcha_response)
+        if not captcha_success:
+            response.errors.append('Incorrect captcha')
+            return Response(json.dumps(response, cls=ResponseEncoder), status=400, mimetype='application/json')
 
     from lmda.models import User
     if User.by_name(username) is not None:

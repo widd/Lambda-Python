@@ -59,9 +59,18 @@ app.config['MAX_ANONYMOUS_FILESIZE_MB'] = 5
 app.config['UPLOAD_DOMAIN'] = "/"
 # Secret key used for sessions and stuff
 app.config['SECRET_KEY'] = 'SUPER_SECRET'
+# Whether to use ReCaptcha or not
+app.config['RECAPTCHA'] = True
+# ReCaptcha secret key
+app.config['RECAPTCHA_SECRET'] = 'SUPER_SECRET'
+# ReCaptcha public key
+app.config['RECAPTCHA_PUBLIC'] = 'SUPER_SECRET'
 
-# This shouldn't be user-configurable, and is based off of user-configurable options
+# The following lines shouldn't be user-configurable, and are based off of user-configurable options
 app.config['MAX_CONTENT_LENGTH'] = app.config['MAX_FILESIZE_MB'] * 1024 * 1024
+if not app.config['RECAPTCHA_PUBLIC'] or not app.config['RECAPTCHA_SECRET']:
+    print('ReCaptcha public and private keys are not both defined. Disabling ReCaptcha.')
+    app.config['RECAPTCHA'] = False
 
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
