@@ -1,5 +1,5 @@
 import os
-from flask import render_template, send_file
+from flask import render_template, send_file, session
 from lmda import app
 
 
@@ -22,3 +22,8 @@ def generic_by_ext(extension):
 @app.errorhandler(404)
 def not_found(e):
     return render_template('error.html', message='Nothing\'s Here'), 404
+
+
+@app.before_request
+def make_session_permanent():
+    session.permanent = True
