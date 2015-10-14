@@ -5,7 +5,7 @@ import string
 from flask import request, render_template, Response
 from flask.ext.login import login_user, current_user, logout_user
 from passlib.context import CryptContext
-from lmda import app, ResponseEncoder, db
+from lmda import app, ResponseEncoder, db, start_last_modified
 from lmda.recaptcha import validate_captcha
 
 pwd_context = CryptContext(
@@ -24,12 +24,26 @@ class EmptyClass:
 
 @app.route('/login')
 def login():
-    return render_template('login.html')
+    if 'If-Modified-Since' in request.headers:
+        if request.headers['If-Modified-Since'] == start_last_modified:
+            return Response(status=304)
+
+    response = Response(render_template('login.html'))
+    response.headers['Last-Modified'] = start_last_modified
+
+    return response
 
 
 @app.route('/register')
 def register():
-    return render_template('register.html', recaptcha_sitekey=app.config['RECAPTCHA_PUBLIC'])
+    if 'If-Modified-Since' in request.headers:
+        if request.headers['If-Modified-Since'] == start_last_modified:
+            return Response(status=304)
+
+    response = Response(render_template('index.html', recaptcha_sitekey=app.config['RECAPTCHA_PUBLIC']))
+    response.headers['Last-Modified'] = start_last_modified
+
+    return response
 
 
 @app.route('/api/session', methods=['DELETE'])
@@ -67,7 +81,14 @@ def get_session_info():
 
 @app.route('/user/manage')
 def manage_user():
-    return render_template('manageAccount.html')
+    if 'If-Modified-Since' in request.headers:
+        if request.headers['If-Modified-Since'] == start_last_modified:
+            return Response(status=304)
+
+    response = Response(render_template('manageAccount.html'))
+    response.headers['Last-Modified'] = start_last_modified
+
+    return response
 
 
 @app.route('/api/user/new', methods=['POST'])

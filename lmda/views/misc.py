@@ -1,16 +1,30 @@
 import os
 from flask import render_template, send_file, session, request, Response
-from lmda import app
+from lmda import app, start_last_modified
 
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    if 'If-Modified-Since' in request.headers:
+        if request.headers['If-Modified-Since'] == start_last_modified:
+            return Response(status=304)
+
+    response = Response(render_template('index.html'))
+    response.headers['Last-Modified'] = start_last_modified
+
+    return response
 
 
 @app.route('/about')
 def about():
-    return render_template('about.html')
+    if 'If-Modified-Since' in request.headers:
+        if request.headers['If-Modified-Since'] == start_last_modified:
+            return Response(status=304)
+
+    response = Response(render_template('about.html'))
+    response.headers['Last-Modified'] = start_last_modified
+
+    return response
 
 
 @app.route('/generic/by-ext/<extension>')

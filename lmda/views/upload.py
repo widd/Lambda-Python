@@ -33,7 +33,14 @@ class LegacyResponseFile:
 
 @app.route('/upload')
 def upload():
-    return render_template('upload.html')
+    if 'If-Modified-Since' in request.headers:
+        if request.headers['If-Modified-Since'] == start_last_modified:
+            return Response(status=304)
+
+    response = Response(render_template('upload.html'))
+    response.headers['Last-Modified'] = start_last_modified
+
+    return response
 
 
 @app.route('/api/upload/restrictions', methods=['GET'])

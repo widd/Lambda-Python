@@ -3,7 +3,7 @@ import mimetypes
 import os
 from flask import send_from_directory, Response, request, render_template
 from flask.ext.login import current_user
-from lmda import app
+from lmda import app, start_last_modified
 from lmda.models import Thumbnail
 from lmda.views import paste
 
@@ -119,4 +119,11 @@ def get_past_uploads():
 
 @app.route('/user/uploads')
 def view_past_uploads():
-    return render_template('pastUploads.html')
+    if 'If-Modified-Since' in request.headers:
+        if request.headers['If-Modified-Since'] == start_last_modified:
+            return Response(status=304)
+
+    response = Response(render_template('pastUploads.html'))
+    response.headers['Last-Modified'] = start_last_modified
+
+    return response
