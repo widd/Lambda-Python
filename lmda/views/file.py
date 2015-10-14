@@ -44,9 +44,17 @@ def view_image(name):
     if '.' not in name:
         for extension in app.config['ALLOWED_TYPES']:
             if os.path.isfile(path + '.' + extension):  # file exists
+                if 'If-Modified-Since' in request.headers:
+                    # TODO check file mod time
+                    return Response(status=304)
+
                 return send_from_directory(os.getcwd() + '/' + app.config['UPLOAD_FOLDER'], name + '.' + extension,
                                            mimetype=mimetypes.types_map.get('.' + extension, 'application/octet-stream'))
     elif os.path.isfile(os.getcwd() + '/' + path):
+        if 'If-Modified-Since' in request.headers:
+            # TODO check file mod time
+            return Response(status=304)
+
         filename, file_extension = os.path.splitext(path)
         return send_from_directory(os.getcwd() + '/' + app.config['UPLOAD_FOLDER'], name,
                                    mimetype=mimetypes.types_map.get(file_extension, 'application/octet-stream'))
