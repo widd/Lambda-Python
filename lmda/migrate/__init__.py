@@ -11,7 +11,7 @@ Session = sessionmaker(bind=engine)
 session = Session()
 
 for user in session.query(oldmodels.User).all():
-    new_user = User(id=user.id, username=user.username, password='$'+user.password, creation_date=user.creation_date, api_key=user.apikey, encryption_enabled=user.encryption_enabled, theme_name=user.theme_name)
+    new_user = User(id=user.id, username=user.username, password='$'+user.password.replace('$pbkdf2_sha256$', '$pbkdf2-sha256$'), creation_date=user.creation_date, api_key=user.apikey, encryption_enabled=user.encryption_enabled, theme_name=user.theme_name)
     db.session.add(new_user)
     db.session.commit()
 
