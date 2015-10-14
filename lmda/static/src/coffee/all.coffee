@@ -1,5 +1,6 @@
 userDropdownDown = false
 username = null
+uploadRestrictions = null
 
 getSessionInfo = (onSuccess, onFail) ->
   request = new XMLHttpRequest()
@@ -79,6 +80,14 @@ signOut = () ->
 
   request.send()
 
+fetchServerConfig = =>
+  xmlHttp = new XMLHttpRequest()
+  xmlHttp.onreadystatechange = =>
+    if xmlHttp.readyState == 4 && xmlHttp.status == 200
+        uploadRestrictions = JSON.parse(xmlHttp.responseText)
+  xmlHttp.open("GET", "/api/upload/restrictions", true)  # true for asynchronous
+  xmlHttp.send(null);
+
 entityMap =
   "&": "&amp;"
   "<": "&lt;"
@@ -91,3 +100,5 @@ escapeHtml = (string) ->
   return String(string).replace(/[&<>"'\/]/g,
     (s) ->
       return entityMap[s])
+
+fetchServerConfig()

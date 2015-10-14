@@ -8,22 +8,18 @@ anonSizeLimit = sizeLimit
 apikey = ""
 anonUpload = true
 
-fetchServerConfig = =>
-  xmlHttp = new XMLHttpRequest()
-  xmlHttp.onreadystatechange = =>
-    if xmlHttp.readyState == 4 && xmlHttp.status == 200
-        response = JSON.parse(xmlHttp.responseText)
-        uploadDomain = response.upload_domain
-        sizeLimit = response.max_filesize_mb
-        allowedExtensions = response.allowed_types
-        noExtensionTypes = response.no_extension_types
-        anonSizeLimit = response.max_anon_filesize_mb
-        anonUpload = response.anonymous_upload
-  xmlHttp.open("GET", configUrl, true)  # true for asynchronous
-  xmlHttp.send(null);
+setupRestrictions = =>
+  uploadDomain = uploadRestrictions.upload_domain
+  sizeLimit = uploadRestrictions.max_filesize_mb
+  allowedExtensions = uploadRestrictions.allowed_types
+  noExtensionTypes = uploadRestrictions.no_extension_types
+  anonSizeLimit = uploadRestrictions.max_anon_filesize_mb
+  anonUpload = uploadRestrictions.anonymous_upload
 
 
 checkAndUpload = (file) ->
+  setupRestrictions()
+
   errorList = document.getElementById("errorList")
 
   if not anonUpload and username is null
@@ -160,6 +156,3 @@ shouldOmmitExtension = (file) ->
 
 getExtension = (file) ->
   return file.name.split('.').pop()
-
-
-fetchServerConfig()
