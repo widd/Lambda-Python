@@ -195,11 +195,14 @@ def put_upload():
 
         user = current_user
 
-        if user.is_anonymous and api_key is not None:
+        if user.is_anonymous:
+            user = None
+
+        if api_key is not None:
             from lmda.models import User
             user = User.by_api_key(api_key)
 
-        if user is None or user.is_anonymous:
+        if user is None:
             if not app.config["ANONYMOUS_UPLOAD"]:
                 response.errors.append('You must be signed in')
                 return Response(json.dumps(response, cls=ResponseEncoder), status=400, mimetype='application/json')
@@ -217,8 +220,8 @@ def put_upload():
                 response.url += '.' + extension
 
             if file.content_length > app.config['MAX_FILESIZE_MB']*1000000 or \
-                    ((user is None or user.is_anonymous) and file.content_length > app.config['MAX_ANONYMOUS_FILESIZE_MB']*1000000):
-                if user is None or user.is_anonymous:
+                    (user is None and file.content_length > app.config['MAX_ANONYMOUS_FILESIZE_MB']*1000000):
+                if user is None:
                     response.errors.append('Filesize ' + str(file.content_length/1000000) + ' > ' + app.config['MAX_ANONYMOUS_FILESIZE_MB'] + ' MB')
                 else:
                     response.errors.append('Filesize ' + str(file.content_length/1000000) + ' > ' + app.config['MAX_FILESIZE_MB'] + ' MB')
@@ -228,8 +231,8 @@ def put_upload():
             file.seek(0, os.SEEK_END)
             file_length = file.tell()
             if file_length > app.config['MAX_FILESIZE_MB']*1000000 or \
-                    ((user is None or user.is_anonymous) and file_length > app.config['MAX_ANONYMOUS_FILESIZE_MB']*1000000):
-                if user is None or user.is_anonymous:
+                    (user is None and file_length > app.config['MAX_ANONYMOUS_FILESIZE_MB']*1000000):
+                if user is None:
                     response.errors.append('Filesize ' + str(file_length/1000000) + ' > ' + app.config['MAX_ANONYMOUS_FILESIZE_MB'] + ' MB')
                 else:
                     response.errors.append('Filesize ' + str(file_length/1000000) + ' > ' + app.config['MAX_FILESIZE_MB'] + ' MB')
@@ -244,7 +247,7 @@ def put_upload():
             # SUCCESS !!!
 
             # Create thumbnail
-            if not (user is None or user.is_anonymous) and extension in app.config['THUMBNAIL_TYPES']:
+            if user is not None and extension in app.config['THUMBNAIL_TYPES']:
                 from lmda.models import Thumbnail
                 thumbnail_process_pool.apply_async(
                     create_thumbnail,
