@@ -1,11 +1,15 @@
+import datetime
 import json
 import os
 import random
 import string
+from wsgiref.handlers import format_date_time
 from flask import render_template, request, Response
 from flask.ext.login import current_user
 import sys
-from lmda import app, db, thumbnail_process_pool
+import time
+import pytz
+from lmda import app, db, thumbnail_process_pool, script_start_time, start_last_modified, gmt_timezone
 from lmda.models import Thumbnail, Paste
 from thumnail_create import create_thumbnail
 
@@ -35,6 +39,16 @@ def upload():
 
 @app.route('/api/upload/restrictions', methods=['GET'])
 def restrictions():
+    if 'If-Modified-Since' in request.headers:
+        last_seen = datetime.datetime.strptime(
+          request.headers['If-Modified-Since'],
+          "%a, %d %b %Y %H:%M:%S %Z")
+        last_mod = datetime.datetime.strptime(
+          start_last_modified,
+          "%a, %d %b %Y %H:%M:%S %Z")
+        if last_seen >= last_mod:
+            return Response(status=304)
+
     response = UploadResponse()
 
     response.anonymous_upload = app.config["ANONYMOUS_UPLOAD"]
@@ -44,7 +58,10 @@ def restrictions():
     response.upload_domain = app.config['UPLOAD_DOMAIN']
     response.no_extension_types = app.config['NO_EXTENSION_TYPES']
 
-    return Response(json.dumps(response, cls=ResponseEncoder), mimetype='application/json')
+    response = Response(json.dumps(response, cls=ResponseEncoder), mimetype='application/json')
+    response.headers['Last-Modified'] = start_last_modified
+
+    return response
 
 
 @app.route('/upload', methods=['POST'])

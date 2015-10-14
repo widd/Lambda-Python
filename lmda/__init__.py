@@ -1,13 +1,21 @@
+import datetime
+import time
+import pytz
 import json
 import logging
 from multiprocessing.pool import Pool
 import os
+from wsgiref.handlers import format_date_time
 from flask import Flask
 from flask.ext import assets
 from flask.ext.login import LoginManager
 from flask.ext.sqlalchemy import SQLAlchemy
 from webassets import Bundle
 from webassets.filter import get_filter
+
+script_start_time = datetime.datetime.utcnow()
+gmt_timezone = pytz.timezone('GMT')
+start_last_modified = format_date_time(time.mktime(script_start_time.replace(tzinfo=pytz.utc).astimezone(gmt_timezone).timetuple()))
 
 thumbnail_process_pool = Pool(2)
 
