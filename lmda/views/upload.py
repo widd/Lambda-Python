@@ -56,6 +56,8 @@ def legacy_upload():  # LEGACY, DO NOT USE, WILL BE REMOVED SOON
     if api_key is None:
         response.errors.append('No api key POSTed')
 
+        response.success = False
+
         # No 400 code is intentional because the old API gave a 200
         # Not setting json mime type is intentional because the old API didn't set it
         return json.dumps(response, cls=ResponseEncoder)
@@ -65,6 +67,7 @@ def legacy_upload():  # LEGACY, DO NOT USE, WILL BE REMOVED SOON
 
     if user is None:
         response.errors.append('Invalid API key')
+        response.success = False
         # No 400 code is intentional because the old API gave a 200
         # Not setting json mime type is intentional because the old API didn't set it
         return json.dumps(response, cls=ResponseEncoder)
@@ -80,10 +83,13 @@ def legacy_upload():  # LEGACY, DO NOT USE, WILL BE REMOVED SOON
         extension_allowed = app.config.get('ALLOWED_TYPES', None) is None or extension in app.config['ALLOWED_TYPES']
         if not extension_allowed:
             response.errors.append('Extension not allowed: ' + extension)
+            response.success = False
+            return json.dumps(response, cls=ResponseEncoder), 500
 
         filename = gen_filename()
         if filename is None:
             response.errors.append('Error generating filename')
+            response.success = False
             return json.dumps(response, cls=ResponseEncoder), 500
 
         try:
@@ -98,6 +104,7 @@ def legacy_upload():  # LEGACY, DO NOT USE, WILL BE REMOVED SOON
 
             if file.content_length > app.config['MAX_FILESIZE_MB']*1000000:
                 response.errors.append('Filesize ' + str(file.content_length/1000000) + ' > ' + app.config['MAX_FILESIZE_MB'] + ' MB')
+                response.success = False
                 # No 400 code is intentional because the old API gave a 200
                 # Not setting json mime type is intentional because the old API didn't set it
                 return json.dumps(response, cls=ResponseEncoder)
@@ -107,6 +114,7 @@ def legacy_upload():  # LEGACY, DO NOT USE, WILL BE REMOVED SOON
             file_length = file.tell()
             if file_length > app.config['MAX_FILESIZE_MB']*1000000:
                 response.errors.append('Filesize ' + str(file_length/1000000) + ' > ' + app.config['MAX_FILESIZE_MB'] + ' MB')
+                response.success = False
                 # No 400 code is intentional because the old API gave a 200
                 # Not setting json mime type is intentional because the old API didn't set it
                 return json.dumps(response, cls=ResponseEncoder)
@@ -128,6 +136,7 @@ def legacy_upload():  # LEGACY, DO NOT USE, WILL BE REMOVED SOON
                     callback=add_thumbnail
                 )
 
+            response.success = True
             return json.dumps(response, cls=ResponseEncoder)
         except IOError as e:
             sys.stderr.write(str(e))
@@ -158,6 +167,7 @@ def put_upload():
         extension_allowed = app.config.get('ALLOWED_TYPES', None) is None or extension in app.config['ALLOWED_TYPES']
         if not extension_allowed:
             response.errors.append('Extension not allowed: ' + extension)
+            return Response(json.dumps(response, cls=ResponseEncoder), status=400, mimetype='application/json')
 
         filename = gen_filename()
         if filename is None:
