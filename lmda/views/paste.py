@@ -60,7 +60,7 @@ def put_paste():
 
     filename = gen_filename()
 
-    paste = Paste(name=filename, owner=uploader_id, content_json=paste_text, is_code=(1 if is_code else 0), upload_date=datetime.datetime.utcnow())
+    paste = Paste(name=filename, owner=uploader_id, content_json=paste_text, is_code=is_code, upload_date=datetime.datetime.utcnow())
     db.session.add(paste)
     db.session.commit()
 

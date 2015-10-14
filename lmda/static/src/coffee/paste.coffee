@@ -24,13 +24,10 @@ toggleCode = =>
 
 toggleTopbar = =>
   header = document.querySelector("header")
-  timeRemaining = document.getElementById("time-remaining")
   if showTopbar
     header.className = "hidden"
-    timeRemaining.className = "time-remaining"
   else
     header.className = "regular"
-    timeRemaining.className = "hidden"
 
   showTopbar = !showTopbar
 

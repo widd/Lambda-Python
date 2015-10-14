@@ -54,7 +54,7 @@ app.config['ULTIMATE_GENERIC_IMAGE'] = '/static/img/generic/generic.svg'
 # Whether to allow uploading as an anonymous user
 app.config['ANONYMOUS_UPLOAD'] = False
 # Whether to allow pasting as an anonymous user
-app.config['ANONYMOUS_PASTE'] = False
+app.config['ANONYMOUS_PASTE'] = True  # TODO has no effect
 # Maximum filesize (in MB) for an upload by an authenticated user
 app.config['MAX_FILESIZE_MB'] = 20
 # Maximum filsize (in MB) for an upload by an anonymous user
