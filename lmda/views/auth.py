@@ -9,12 +9,12 @@ from lmda import app, ResponseEncoder, db
 from lmda.recaptcha import validate_captcha
 
 pwd_context = CryptContext(
-    schemes=["pbkdf2_sha256"],
-    default="pbkdf2_sha256",
+    schemes=["django_pbkdf2_sha256"],
+    default="django_pbkdf2_sha256",
 
     all__vary_rounds="10%",
 
-    pbkdf2_sha256__default_rounds=12000
+    django_pbkdf2_sha256__default_rounds=12000
 )
 
 
