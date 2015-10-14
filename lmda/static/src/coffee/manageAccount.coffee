@@ -5,6 +5,7 @@ setInfo = =>
       apiKeyArea.innerHTML = userInfo.api_key
     ),
     (=>
+      window.location.href = "/login"
     )
   )
 
