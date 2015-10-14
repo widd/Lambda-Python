@@ -41,15 +41,20 @@ class ResponseEncoder(json.JSONEncoder):
 def view_image(name):
     path = os.path.join(app.config['UPLOAD_FOLDER'], name)
 
+    print("DAMN")
+
     if '.' not in name:
         for extension in app.config['ALLOWED_TYPES']:
+            print(extension)
             if os.path.isfile(path + '.' + extension):  # file exists
                 return send_from_directory(os.getcwd() + '/' + app.config['UPLOAD_FOLDER'], name + '.' + extension,
                                            mimetype=mimetypes.types_map.get('.' + extension, 'application/octet-stream'))
-    elif os.path.isfile(path):
+    elif os.path.isfile(os.getcwd() + '/' + path):
         filename, file_extension = os.path.splitext(path)
+        print(filename)
+        print(file_extension)
         return send_from_directory(os.getcwd() + '/' + app.config['UPLOAD_FOLDER'], name,
-                                   mimetype=mimetypes.types_map.get('.' + file_extension, 'application/octet-stream'))
+                                   mimetype=mimetypes.types_map.get(file_extension, 'application/octet-stream'))
 
     return paste.view_paste(name)
 

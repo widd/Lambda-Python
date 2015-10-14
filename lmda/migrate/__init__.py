@@ -16,7 +16,7 @@ for user in session.query(oldmodels.User).all():
     db.session.commit()
 
 for file in session.query(oldmodels.File).all():
-    new_file = File(id=file.id, owner=file.owner, name=file.name, extension=file.extension, encrypted=file.encrypted, local_name=file.local_name, upload_date=file.upload_date, has_thumbnail=False)
+    new_file = File(id=file.id, owner=file.owner, name=file.name, extension=file.extension[1:], encrypted=file.encrypted, local_name=file.local_name, upload_date=file.upload_date, has_thumbnail=False)
     db.session.add(new_file)
     db.session.commit()
 
