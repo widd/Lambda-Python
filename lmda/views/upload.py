@@ -67,6 +67,7 @@ def restrictions():
 
     response = Response(json.dumps(response, cls=ResponseEncoder), mimetype='application/json')
     response.headers['Last-Modified'] = start_last_modified
+    response.headers['Cache-Control'] = 'public, max-age=86400'
 
     return response
 
