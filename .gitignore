@@ -19,5 +19,6 @@ __pycache__/
 # Compiled static assets
 /lmda/static/css/
 /lmda/static/js/
+/lmda/static/shtml/
 
 /prod.cfg

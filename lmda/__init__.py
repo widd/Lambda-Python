@@ -139,3 +139,6 @@ class ResponseEncoder(json.JSONEncoder):
 
 
 import lmda.views
+
+with app.app_context():
+    lmda.views.create_static_html()
