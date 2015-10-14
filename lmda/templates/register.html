@@ -25,7 +25,9 @@
 </header>
 <main>
     <div class="form-wrapper">
-        <form action="/api/user/new" method="POST">
+        <div id="errorArea"></div>
+
+        <form action="/api/user/new" method="POST" id="registerForm" onsubmit="return register();">
             <input type="text" name="username" placeholder="Username">
             <input type="password" name="password" placeholder="Password">
             <input type="password" name="password_confirm" placeholder="Confirm Password">
@@ -41,9 +43,9 @@
     <div class="center-text"><a href="/login">Sign in to existing account</a></div>
 </main>
 
-{#{% assets 'auth_js' %}#}
-{#    <script type="text/javascript" src="{{ ASSET_URL }}" defer></script>#}
-{#{% endassets %}#}
+{% from "_util.html" import import_js %}
+{{ import_js('all_js') }}
+{{ import_js('register_js') }}
 </body>
 
 </html>
