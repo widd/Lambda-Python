@@ -3,13 +3,12 @@ import json
 import os
 import random
 import string
-from wsgiref.handlers import format_date_time
+import sys
+
 from flask import render_template, request, Response
 from flask.ext.login import current_user
-import sys
-import time
-import pytz
-from lmda import app, db, thumbnail_process_pool, script_start_time, start_last_modified, gmt_timezone
+
+from lmda import app, db, thumbnail_process_pool, start_last_modified
 from lmda.models import Thumbnail, Paste
 from thumnail_create import create_thumbnail
 
@@ -57,6 +56,7 @@ def restrictions():
     response.max_anon_filesize_mb = app.config['MAX_ANONYMOUS_FILESIZE_MB']
     response.upload_domain = app.config['UPLOAD_DOMAIN']
     response.no_extension_types = app.config['NO_EXTENSION_TYPES']
+    response.thumbnail_types = app.config['THUMBNAIL_TYPES']
 
     response = Response(json.dumps(response, cls=ResponseEncoder), mimetype='application/json')
     response.headers['Last-Modified'] = start_last_modified

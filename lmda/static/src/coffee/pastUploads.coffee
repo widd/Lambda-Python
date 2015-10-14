@@ -9,6 +9,7 @@ searchText = null
 
 uploadDomain = "/"
 noExtensionTypes = []
+thumbnailTypes = []
 
 fetchServerConfig = =>
   xmlHttp = new XMLHttpRequest()
@@ -17,6 +18,7 @@ fetchServerConfig = =>
         response = JSON.parse(xmlHttp.responseText)
         uploadDomain = response.upload_domain
         noExtensionTypes = response.no_extension_types
+        thumbnailTypes = response.thumbnail_types
   xmlHttp.open("GET", configUrl, true)  # true for asynchronous
   xmlHttp.send(null);
 
@@ -76,7 +78,10 @@ getUploads = =>
           if upload.has_thumb
             setThumb(img, upload.name)
           else
-            img.src = '/' + upload.name + '.' + upload.extension
+            if upload.extension in thumbnailTypes
+              img.src = '/' + upload.name + '.' + upload.extension
+            else
+              img.src = "/generic/by-ext/#{upload.extension}"
 
           img.alt = upload.local_name
           a.appendChild(img)

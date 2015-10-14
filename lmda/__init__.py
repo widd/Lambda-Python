@@ -39,7 +39,7 @@ app.config['ALLOWED_TYPES'] = [
 # Extensions to omit the extension of when linking
 app.config['NO_EXTENSION_TYPES'] = ['png', 'jpg', 'jpeg', 'gif', 'mp3']
 # Types to attempt to make a thumbnail for
-app.config['THUMBNAIL_TYPES'] = ['png', 'jpg', 'jpeg', 'gif']
+app.config['THUMBNAIL_TYPES'] = ['png', 'jpg', 'jpeg', 'gif', 'tiff', 'webp', 'svg']
 # Images to use in replacement of a thumbnail for types
 app.config['GENERIC_IMAGES'] = {
     'png': '/static/img/generic/image.svg',

@@ -1,5 +1,5 @@
 import os
-from flask import render_template, send_file, session
+from flask import render_template, send_file, session, request, Response
 from lmda import app
 
 
@@ -15,6 +15,9 @@ def about():
 
 @app.route('/generic/by-ext/<extension>')
 def generic_by_ext(extension):
+    if 'If-Modified-Since' in request.headers:
+        return Response(status=304)
+
     generic_path = app.config['GENERIC_IMAGES'].get(extension, app.config['ULTIMATE_GENERIC_IMAGE'])
     return send_file(os.getcwd() + '/lmda' + generic_path)
 
