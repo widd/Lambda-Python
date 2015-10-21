@@ -43,7 +43,13 @@ decrypt = (text, key) ->
   sjcl.decrypt(key, text)
 
 submitPaste = =>
-  paste_plaintext = document.getElementById("paste-area").value
+  paste_plaintext = null
+  if code
+    codeMirror = document.getElementsByClassName("CodeMirror")[0]
+    paste_plaintext = codeMirror.CodeMirror.getValue()
+  else
+    paste_plaintext = document.getElementById("paste-area").value
+
   encryption_key = genEncKey()
   paste_encrypted = encrypt(paste_plaintext, encryption_key)
   paste_enc_obj = JSON.parse(paste_encrypted)
