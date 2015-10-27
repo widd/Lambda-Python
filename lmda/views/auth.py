@@ -40,7 +40,7 @@ def register():
         if request.headers['If-Modified-Since'] == start_last_modified:
             return Response(status=304)
 
-    response = Response(render_template('index.html', recaptcha_sitekey=app.config['RECAPTCHA_PUBLIC']))
+    response = Response(render_template('register.html', recaptcha_sitekey=app.config['RECAPTCHA_PUBLIC']))
     response.headers['Last-Modified'] = start_last_modified
 
     return response

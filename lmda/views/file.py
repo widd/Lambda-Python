@@ -4,7 +4,7 @@ import os
 from flask import send_from_directory, Response, request, render_template
 from flask.ext.login import current_user
 from lmda import app, start_last_modified
-from lmda.models import Thumbnail
+from lmda.models import Thumbnail, Authority
 from lmda.views import paste
 
 
@@ -70,6 +70,60 @@ def get_thumbnails(name):
     for t in Thumbnail.by_parent(name):
         response.thumbnails.append(ReturnThumbnail(t.url, t.parent_name, t.width, t.height))
 
+    return Response(json.dumps(response, cls=ResponseEncoder), mimetype='application/json')
+
+
+@app.route('/api/admin/uploads')
+def get_admin_uploads():
+    api_key = request.form.get('api_key')
+
+    n = int(request.args.get('n', 10))
+    page_num = int(request.args.get('page', 1))
+    searchText = request.args.get('nameContains', None)
+    owner_username = request.args.get('ownerUsername')
+
+    n = max(min(n, 50), 1)  # Clamp n between 1 and 50
+
+    user = current_user
+
+    if user.is_anonymous and api_key is not None:
+        from lmda.models import User
+        user = User.by_api_key(api_key)
+
+    response = JsonResponse()
+
+    if user is None or user.is_anonymous:
+        response.errors = ['Not signed in']
+        return Response(json.dumps(response, cls=ResponseEncoder), status=400, mimetype='application/json')
+
+    authority = Authority.by_user_id(user.id)
+    if authority is None:
+        response.errors = ['No authority']
+        return Response(json.dumps(response, cls=ResponseEncoder), status=400, mimetype='application/json')
+
+    from lmda.models import File, User
+
+    query = File.query
+
+    if owner_username is not None:
+        target_owner = User.by_name(owner_username)
+        if target_owner is not None:
+            query = query.filter(File.owner == target_owner.id)
+
+    if searchText is not None:
+        query = query.filter(File.local_name.ilike('%' + searchText + '%'))
+
+    query = query.order_by(File.id.desc())
+
+    pagination = query.paginate(page=page_num, per_page=n)
+
+    files = []
+    for f in pagination.items:
+        pu = PastUpload(f.id, f.name, f.local_name, f.extension, f.has_thumbnail)
+        files.append(pu)
+
+    response.files = files
+    response.number_pages = pagination.pages
     return Response(json.dumps(response, cls=ResponseEncoder), mimetype='application/json')
 
 

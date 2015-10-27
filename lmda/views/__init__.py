@@ -1,6 +1,6 @@
 import os
 from flask import render_template
-from lmda.views import auth, misc, paste, upload, file
+from lmda.views import auth, misc, paste, upload, file, admin
 
 
 def create_static_html():

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>λ | Admin Upload Manage</title>
+
+    {% from "_util.html" import import_css %}
+    {{ import_css('main_css') }}
+    {{ import_css('past_upload_css') }}
+
+    {% include "shared_head.html" %}
+</head>
+
+<body>
+<header>
+    {% include "topbar.html" %}
+</header>
+<main class="content">
+    <noscript><h2>JavaScript appears to be blocked or disabled. This page and most of Lambda will not work without JavaScript enabled.</h2></noscript>
+
+    <form id="ownerInfo">
+        <label for="ownerUsername">Username</label>
+        <input type="text" id="ownerUsername">
+    </form>
+
+    <a href="#" onclick="getUploads()">Update</a>
+
+    <h2 id="pageNum">Loading...</h2>
+    <ul class="upload-container" id="uploads">
+    </ul>
+    <div class="navRow">
+        <a href="" id="goBack" onclick="prevPage(); return false;" class="navButton hidden">Previous</a>
+        <a href="" id="goNext" onClick="nextPage(); return false;" class="navButton hidden">Next</a>
+    </div>
+</main>
+
+{% from "_util.html" import import_js %}
+{{ import_js('all_js') }}
+{{ import_js('admin_upload_manage_js') }}
+</body>
+
+</html>

@@ -80,3 +80,15 @@ class Thumbnail(db.Model):
     @staticmethod
     def by_parent(name):
         return Thumbnail.query.filter(Thumbnail.parent_name == name).all()
+
+
+class Authority(db.Model):
+    __tablename__ = 'authorities'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, nullable=False, unique=True)
+    authority_level = db.Column(db.Integer, nullable=False)
+
+    @staticmethod
+    def by_user_id(user_id):
+        return Authority.query.filter(Authority.user_id == user_id).first()
