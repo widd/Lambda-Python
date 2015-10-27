@@ -8,6 +8,9 @@ from lmda.models import Thumbnail, Authority
 from lmda.views import paste
 
 
+mimetypes.add_type('video/webm', 'webm')
+
+
 class JsonResponse:
     def __init__(self):
         self.errors = []
