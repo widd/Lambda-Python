@@ -3,8 +3,8 @@ import mimetypes
 import os
 from flask import send_from_directory, Response, request, render_template
 from flask.ext.login import current_user
-from lmda import app, start_last_modified
-from lmda.models import Thumbnail, Authority
+from lmda import app, start_last_modified, db
+from lmda.models import Thumbnail, Authority, File
 from lmda.views import paste
 
 
@@ -38,6 +38,39 @@ class ResponseEncoder(json.JSONEncoder):
             return json.JSONEncoder.default(self, obj)
         values = obj.__dict__
         return values
+
+
+@app.route('/file/<name>', methods=['DELETE'])
+def delete_file(name):
+    api_key = request.form.get('api_key')
+
+    # TODO delete pastes too
+    response = JsonResponse()
+
+    user = current_user
+
+    if user.is_anonymous and api_key is not None:
+        from lmda.models import User
+        user = User.by_api_key(api_key)
+
+    if user is None or user.is_anonymous:
+        response.errors = ['Not signed in']
+        return Response(json.dumps(response, cls=ResponseEncoder), status=400, mimetype='application/json')
+
+    file = File.by_name(name)
+    if file is None:
+        response.errors = ["File doesn't exist"]
+        return Response(json.dumps(response, cls=ResponseEncoder), status=400, mimetype='application/json')
+    if file.owner is not user.id:
+        response.errors = ['Not your file']
+        return Response(json.dumps(response, cls=ResponseEncoder), status=400, mimetype='application/json')
+
+    filename = file.name + '.' + file.extension
+    os.remove(os.getcwd() + '/' + app.config['UPLOAD_FOLDER'] + '/' + filename)
+    db.session.delete(file)
+    db.session.commit()
+
+    return Response(json.dumps(response, cls=ResponseEncoder), mimetype='application/json')
 
 
 @app.route('/<name>', methods=['GET'])

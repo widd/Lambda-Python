@@ -17,6 +17,11 @@
     {% include "topbar.html" %}
 </header>
 <main class="content">
+    <div id="selection-management" class="selection-manage hidden">
+        <h3 id="numSelectedLabel">0 items selected</h3>
+        <button onclick="deleteSelected()">Delete</button>
+    </div>
+
     <noscript><h2>JavaScript appears to be blocked or disabled. This page and most of Lambda will not work without JavaScript enabled.</h2></noscript>
     <h2 id="pageNum">Loading...</h2>
     <ul class="upload-container" id="uploads">

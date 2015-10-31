@@ -11,6 +11,8 @@ uploadDomain = "/"
 noExtensionTypes = []
 thumbnailTypes = []
 
+selectedImages = []
+
 fetchServerConfig = =>
   xmlHttp = new XMLHttpRequest()
   xmlHttp.onreadystatechange = =>
@@ -20,7 +22,7 @@ fetchServerConfig = =>
         noExtensionTypes = response.no_extension_types
         thumbnailTypes = response.thumbnail_types
   xmlHttp.open("GET", configUrl, true)  # true for asynchronous
-  xmlHttp.send(null);
+  xmlHttp.send(null)
 
 getUploads = =>
   specified_page = window.location.hash.substr(1)
@@ -59,6 +61,7 @@ getUploads = =>
           if upload.extension not in noExtensionTypes
             a.href += '.' + upload.extension
           img = document.createElement('img')
+          img.name = upload.name
 
           img.onload = (e) ->
             width = e.target.clientWidth
@@ -74,6 +77,11 @@ getUploads = =>
 
               extension = e.target.src.split('.').pop()
               e.target.src = "/generic/by-ext/#{extension}"
+
+          img.myLi = li
+          img.oncontextmenu = (e) ->
+            toggleSelection(e.target, e.target.myLi)
+            return false
 
           if upload.has_thumb
             setThumb(img, upload.name)
@@ -126,3 +134,34 @@ prevPage = =>
 nextPage = =>
   page = parseInt(page) + 1
   window.location.hash = page
+
+toggleSelection = (img, li) ->
+  if li.className.length == 0
+    li.className = 'selected'
+    selectedImages.push(img)
+  else
+    li.className = ''
+    selectedImages.splice(selectedImages.indexOf(img), 1)
+
+  if selectedImages.length == 0
+    document.getElementById('selection-management').className = "selection-manage hidden"
+  else
+    document.getElementById('selection-management').className = "selection-manage"
+    document.getElementById('numSelectedLabel').innerHTML = "#{selectedImages.length} items selected"
+
+deleteSelected = =>
+  toFinishCount = selectedImages.length
+
+  for img in selectedImages
+    deleteImage(img.name, =>
+      toFinishCount--
+      if toFinishCount == 0
+        location.reload() # Refresh the page
+    )
+
+deleteImage = (name, callback) ->
+  xmlHttp = new XMLHttpRequest()
+  xmlHttp.onreadystatechange = callback
+  xmlHttp.open("DELETE", "/file/#{name}", true)  # true for asynchronous
+  xmlHttp.send(null)
+
