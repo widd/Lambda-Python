@@ -2,7 +2,7 @@ import json
 import mimetypes
 import os
 from flask import send_from_directory, Response, request, render_template
-from flask.ext.login import current_user
+from flask_login import current_user
 from lmda import app, start_last_modified, db
 from lmda.models import Thumbnail, Authority, File
 from lmda.views import paste

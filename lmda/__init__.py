@@ -7,9 +7,9 @@ from multiprocessing.pool import Pool
 import os
 from wsgiref.handlers import format_date_time
 from flask import Flask
-from flask.ext import assets
-from flask.ext.login import LoginManager
-from flask.ext.sqlalchemy import SQLAlchemy
+from flask_assets import assets
+from flask_login import LoginManager
+from flask_sqlalchemy import SQLAlchemy
 from webassets import Bundle
 from webassets.filter import get_filter
 

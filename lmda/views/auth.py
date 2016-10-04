@@ -3,7 +3,7 @@ import json
 import random
 import string
 from flask import request, render_template, Response
-from flask.ext.login import login_user, current_user, logout_user
+from flask_login import login_user, current_user, logout_user
 from passlib.context import CryptContext
 from lmda import app, ResponseEncoder, db, start_last_modified
 from lmda.recaptcha import validate_captcha

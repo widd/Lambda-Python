@@ -1,4 +1,4 @@
-from flask.ext.login import UserMixin
+from flask_login import UserMixin
 from sqlalchemy.ext.declarative import declarative_base
 from lmda import db
 
