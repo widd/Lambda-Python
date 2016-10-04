@@ -6,7 +6,7 @@ import string
 import sys
 
 from flask import render_template, request, Response
-from flask.ext.login import current_user
+from flask_login import current_user
 
 from lmda import app, db, thumbnail_process_pool, start_last_modified
 from lmda.models import Thumbnail, Paste

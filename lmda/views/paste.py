@@ -1,7 +1,7 @@
 import datetime
 import json
 from flask import render_template, request, Response, abort
-from flask.ext.login import current_user
+from flask_login import current_user
 from lmda import app, ResponseEncoder, db
 from lmda.models import Paste
 from lmda.views.upload import gen_filename
