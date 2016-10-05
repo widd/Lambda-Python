@@ -8,4 +8,4 @@ def create_static_html():
         print("Compiling %s" % filename)
         compiled = render_template(filename)
         with open('lmda/static/shtml/%s' % filename, 'w') as outfile:
-            outfile.write(compiled)
+            outfile.write(compiled.encode('utf-8'))
