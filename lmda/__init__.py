@@ -7,7 +7,7 @@ from multiprocessing.pool import Pool
 import os
 from wsgiref.handlers import format_date_time
 from flask import Flask
-from flask_assets import assets
+import flask_assets as assets
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from webassets import Bundle
