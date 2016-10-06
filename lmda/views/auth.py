@@ -5,8 +5,7 @@ import string
 from flask import request, render_template, Response
 from flask_login import login_user, current_user, logout_user
 from passlib.context import CryptContext
-from lmda import app, ResponseEncoder, db, start_last_modified
-from lmda.recaptcha import validate_captcha
+from lmda import app, ResponseEncoder, db, start_last_modified, recaptcha
 
 pwd_context = CryptContext(
     schemes=["django_pbkdf2_sha256"],
@@ -40,7 +39,7 @@ def register():
         if request.headers['If-Modified-Since'] == start_last_modified:
             return Response(status=304)
 
-    response = Response(render_template('register.html', recaptcha_sitekey=app.config['RECAPTCHA_PUBLIC']))
+    response = Response(render_template('register.html'))
     response.headers['Last-Modified'] = start_last_modified
 
     return response
@@ -128,12 +127,9 @@ def create_user():
     # End input validity checks
 
     # Check captcha
-    if app.config['RECAPTCHA']:
-        recaptcha_response = request.form.get('g-recaptcha-response')
-        captcha_success = validate_captcha(recaptcha_response)
-        if not captcha_success:
-            response.errors.append('Incorrect captcha')
-            return Response(json.dumps(response, cls=ResponseEncoder), status=400, mimetype='application/json')
+    if not recaptcha.verify():
+        response.errors.append('Incorrect captcha')
+        return Response(json.dumps(response, cls=ResponseEncoder), status=400, mimetype='application/json')
 
     from lmda.models import User
     if User.by_name(username) is not None:

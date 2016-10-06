@@ -10,10 +10,6 @@
     {{ import_css('form_css') }}
 
     {% include "shared_head.html" %}
-
-    {% if config['RECAPTCHA'] %}
-    <script src='https://www.google.com/recaptcha/api.js'></script>
-    {% endif %}
 </head>
 
 <body>
@@ -31,12 +27,7 @@
             <input type="text" name="username" placeholder="Username">
             <input type="password" name="password" placeholder="Password">
             <input type="password" name="password_confirm" placeholder="Confirm Password">
-
-            {% if config['RECAPTCHA'] %}
-            {# TODO get site key from a js request #}
-            <div class="g-recaptcha" data-sitekey="{{ recaptcha_sitekey }}"></div>
-            {% endif %}
-
+            {{ recaptcha }}
             <input type="submit" value="Register">
         </form>
     </div>

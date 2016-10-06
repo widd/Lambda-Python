@@ -10,6 +10,7 @@ from flask import Flask
 import flask_assets as assets
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
+from flask_recaptcha import ReCaptcha
 from webassets import Bundle
 from webassets.filter import get_filter
 
@@ -72,23 +73,26 @@ app.config['UPLOAD_DOMAIN'] = "/"
 # Secret key used for sessions and stuff
 app.config['SECRET_KEY'] = 'SUPER_SECRET'
 # Whether to use ReCaptcha or not
-app.config['RECAPTCHA'] = True
+app.config['RECAPTCHA_ENABLED'] = False
 # ReCaptcha secret key
-app.config['RECAPTCHA_SECRET'] = 'SUPER_SECRET'
+app.config['RECAPTCHA_SECRET_KEY'] = 'SUPER_SECRET'
 # ReCaptcha public key
-app.config['RECAPTCHA_PUBLIC'] = 'SUPER_SECRET'
+app.config['RECAPTCHA_SITE_KEY'] = 'SUPER_PUBLIC'
 
 if os.environ.get('LAMBDA_CONFIG') is not None:
     app.config.from_envvar('LAMBDA_CONFIG')
 
 # The following lines shouldn't be user-configurable, and are based off of user-configurable options
 app.config['MAX_CONTENT_LENGTH'] = app.config['MAX_FILESIZE_MB'] * 1024 * 1024
-if not app.config['RECAPTCHA_PUBLIC'] or not app.config['RECAPTCHA_SECRET']:
+if not app.config['RECAPTCHA_SITE_KEY'] or not app.config['RECAPTCHA_SECRET_KEY']:
     print('ReCaptcha public and private keys are not both defined. Disabling ReCaptcha.')
-    app.config['RECAPTCHA'] = False
+    app.config['RECAPTCHA_ENABLED'] = False
 
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
+
+recaptcha = ReCaptcha()
+recaptcha.init_app(app)
 
 
 @login_manager.user_loader
