@@ -1,4 +1,5 @@
 from flask_login import UserMixin
+from sqlalchemy import func
 from sqlalchemy.ext.declarative import declarative_base
 from lmda import db
 
@@ -34,7 +35,7 @@ class File(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     owner = db.Column(db.Integer)
-    name = db.Column(db.String, nullable=False, unique=True)
+    name = db.Column(db.String, nullable=True, unique=True)
     extension = db.Column(db.String, nullable=False)
     encrypted = db.Column(db.Boolean, nullable=False, default=False)
     local_name = db.Column(db.String)
@@ -51,6 +52,10 @@ class File(db.Model):
     @staticmethod
     def for_user(id):
         return File.query.filter(File.owner == id)
+
+    @staticmethod
+    def get_next_id():
+        return File.query.count()
 
 
 class Paste(db.Model):
