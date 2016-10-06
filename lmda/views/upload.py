@@ -213,7 +213,8 @@ def put_upload():
         db.session.add(db_file)
         db.session.commit()
 
-        filename = gen_bijective_filename(db_file.id)
+        filename = gen_bijective_filename(db_file.id) if app.config.get('BIJECTIVE_FILENAMES', False) \
+            else gen_filename()
         db_file.name = filename
         db.session.add(db_file)
         db.session.commit()
