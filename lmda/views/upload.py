@@ -9,7 +9,7 @@ from flask import render_template, request, Response
 from flask_login import current_user
 
 from lmda import app, db, thumbnail_process_pool, start_last_modified
-from lmda.models import Thumbnail, Paste
+from lmda.models import Thumbnail, Paste, File
 from thumnail_create import create_thumbnail
 
 
@@ -47,11 +47,11 @@ def upload():
 def restrictions():
     if 'If-Modified-Since' in request.headers:
         last_seen = datetime.datetime.strptime(
-          request.headers['If-Modified-Since'],
-          "%a, %d %b %Y %H:%M:%S %Z")
+            request.headers['If-Modified-Since'],
+            "%a, %d %b %Y %H:%M:%S %Z")
         last_mod = datetime.datetime.strptime(
-          start_last_modified,
-          "%a, %d %b %Y %H:%M:%S %Z")
+            start_last_modified,
+            "%a, %d %b %Y %H:%M:%S %Z")
         if last_seen >= last_mod:
             return Response(status=304)
 
@@ -123,8 +123,9 @@ def legacy_upload():  # LEGACY, DO NOT USE, WILL BE REMOVED SOON
             if extension not in app.config['NO_EXTENSION_TYPES']:
                 response.files[0].url += '.' + extension
 
-            if file.content_length > app.config['MAX_FILESIZE_MB']*1000000:
-                response.errors.append('Filesize ' + str(file.content_length/1000000) + ' > ' + app.config['MAX_FILESIZE_MB'] + ' MB')
+            if file.content_length > app.config['MAX_FILESIZE_MB'] * 1000000:
+                response.errors.append(
+                    'Filesize ' + str(file.content_length / 1000000) + ' > ' + app.config['MAX_FILESIZE_MB'] + ' MB')
                 # No 400 code is intentional because the old API gave a 200
                 # Not setting json mime type is intentional because the old API didn't set it
                 return json.dumps(response, cls=ResponseEncoder)
@@ -132,8 +133,9 @@ def legacy_upload():  # LEGACY, DO NOT USE, WILL BE REMOVED SOON
             # Make sure they didn't lie in content_length
             file.seek(0, os.SEEK_END)
             file_length = file.tell()
-            if file_length > app.config['MAX_FILESIZE_MB']*1000000:
-                response.errors.append('Filesize ' + str(file_length/1000000) + ' > ' + app.config['MAX_FILESIZE_MB'] + ' MB')
+            if file_length > app.config['MAX_FILESIZE_MB'] * 1000000:
+                response.errors.append(
+                    'Filesize ' + str(file_length / 1000000) + ' > ' + app.config['MAX_FILESIZE_MB'] + ' MB')
                 # No 400 code is intentional because the old API gave a 200
                 # Not setting json mime type is intentional because the old API didn't set it
                 return json.dumps(response, cls=ResponseEncoder)
@@ -177,22 +179,6 @@ def put_upload():
     response = UploadResponse()
     file = request.files['file']
     if file:
-        extension_split = file.filename.split('.')
-        if len(extension_split) < 1:
-            response.errors.append('File is missing extension. Name was ' + file.filename + '.')
-            return Response(json.dumps(response, cls=ResponseEncoder), status=400, mimetype='application/json')
-
-        extension = extension_split[-1]
-        extension_allowed = app.config.get('ALLOWED_TYPES', None) is None or extension in app.config['ALLOWED_TYPES']
-        if not extension_allowed:
-            response.errors.append('Extension not allowed: ' + extension)
-            return Response(json.dumps(response, cls=ResponseEncoder), status=400, mimetype='application/json')
-
-        filename = gen_filename()
-        if filename is None:
-            response.errors.append('Error generating filename')
-            return Response(json.dumps(response, cls=ResponseEncoder), status=500, mimetype='application/json')
-
         user = current_user
 
         if user.is_anonymous:
@@ -211,6 +197,31 @@ def put_upload():
         else:
             cur_uid = user.id
 
+        extension_split = file.filename.split('.')
+        if len(extension_split) < 1:
+            response.errors.append('File is missing extension. Name was ' + file.filename + '.')
+            return Response(json.dumps(response, cls=ResponseEncoder), status=400, mimetype='application/json')
+
+        extension = extension_split[-1]
+        extension_allowed = app.config.get('ALLOWED_TYPES', None) is None or extension in app.config['ALLOWED_TYPES']
+        if not extension_allowed:
+            response.errors.append('Extension not allowed: ' + extension)
+            return Response(json.dumps(response, cls=ResponseEncoder), status=400, mimetype='application/json')
+
+        db_file = File(owner=cur_uid, extension=extension, encrypted=False, local_name=file.filename,
+                    has_thumbnail=False)
+        db.session.add(db_file)
+        db.session.commit()
+
+        filename = gen_bijective_filename(db_file.id)
+        db_file.name = filename
+        db.session.add(db_file)
+        db.session.commit()
+
+        if filename is None:
+            response.errors.append('Error generating filename')
+            return Response(json.dumps(response, cls=ResponseEncoder), status=500, mimetype='application/json')
+
         try:
             relative_filename = os.path.join(app.config['UPLOAD_FOLDER'], filename + '.' + extension)
             absolute_filename = os.path.abspath(relative_filename)
@@ -219,30 +230,28 @@ def put_upload():
             if extension not in app.config['NO_EXTENSION_TYPES']:
                 response.url += '.' + extension
 
-            if file.content_length > app.config['MAX_FILESIZE_MB']*1000000 or \
-                    (user is None and file.content_length > app.config['MAX_ANONYMOUS_FILESIZE_MB']*1000000):
+            if file.content_length > app.config['MAX_FILESIZE_MB'] * 1000000 or \
+                    (user is None and file.content_length > app.config['MAX_ANONYMOUS_FILESIZE_MB'] * 1000000):
                 if user is None:
-                    response.errors.append('Filesize ' + str(file.content_length/1000000) + ' > ' + app.config['MAX_ANONYMOUS_FILESIZE_MB'] + ' MB')
+                    response.errors.append('Filesize ' + str(file.content_length / 1000000) + ' > ' + app.config[
+                        'MAX_ANONYMOUS_FILESIZE_MB'] + ' MB')
                 else:
-                    response.errors.append('Filesize ' + str(file.content_length/1000000) + ' > ' + app.config['MAX_FILESIZE_MB'] + ' MB')
+                    response.errors.append('Filesize ' + str(file.content_length / 1000000) + ' > ' + app.config[
+                        'MAX_FILESIZE_MB'] + ' MB')
                 return Response(json.dumps(response, cls=ResponseEncoder), status=400, mimetype='application/json')
 
             # Make sure they didn't lie in content_length
             file.seek(0, os.SEEK_END)
             file_length = file.tell()
-            if file_length > app.config['MAX_FILESIZE_MB']*1000000 or \
-                    (user is None and file_length > app.config['MAX_ANONYMOUS_FILESIZE_MB']*1000000):
+            if file_length > app.config['MAX_FILESIZE_MB'] * 1000000 or \
+                    (user is None and file_length > app.config['MAX_ANONYMOUS_FILESIZE_MB'] * 1000000):
                 if user is None:
-                    response.errors.append('Filesize ' + str(file_length/1000000) + ' > ' + app.config['MAX_ANONYMOUS_FILESIZE_MB'] + ' MB')
+                    response.errors.append('Filesize ' + str(file_length / 1000000) + ' > ' + app.config[
+                        'MAX_ANONYMOUS_FILESIZE_MB'] + ' MB')
                 else:
-                    response.errors.append('Filesize ' + str(file_length/1000000) + ' > ' + app.config['MAX_FILESIZE_MB'] + ' MB')
+                    response.errors.append(
+                        'Filesize ' + str(file_length / 1000000) + ' > ' + app.config['MAX_FILESIZE_MB'] + ' MB')
                 return Response(json.dumps(response, cls=ResponseEncoder), status=400, mimetype='application/json')
-
-            from lmda.models import File
-            file = File(owner=cur_uid, name=filename, extension=extension, encrypted=False, local_name=file.filename,
-                        has_thumbnail=False)
-            db.session.add(file)
-            db.session.commit()
 
             # SUCCESS !!!
 
@@ -267,15 +276,34 @@ def put_upload():
         return Response(json.dumps(response, cls=ResponseEncoder), status=400, mimetype='application/json')
 
 
+def gen_bijective_filename(fid):
+    charset = string.ascii_letters + string.digits
+    digits = []
+
+    # Can't divide 0
+    if fid == 0:
+        return 'a'
+    else:
+        while fid > 0:
+            rem = fid % len(charset)
+            digits.append(rem)
+            fid /= len(charset)
+
+        digits.reverse()
+
+        return ''.join([charset[c] for c in digits])
+
+
 def gen_filename(max_tries=5, start_length=3, tries_per_len_incr=3):
     tries = 0
     while True:
         if tries >= max_tries:
             return None
 
-        extra_length = int(tries/tries_per_len_incr)
+        extra_length = int(tries / tries_per_len_incr)
 
-        filename = ''.join(random.SystemRandom().choice(string.ascii_letters + string.digits) for _ in range(start_length + extra_length))
+        filename = ''.join(random.SystemRandom().choice(string.ascii_letters + string.digits) for _ in
+                           range(start_length + extra_length))
 
         if Paste.by_name(filename) is not None:
             tries += 1
@@ -310,5 +338,6 @@ def add_thumbnail(result):
         file.has_thumbnail = True
         db.session.add(thumbnail)
         db.session.commit()
+
 
 db.create_all()
