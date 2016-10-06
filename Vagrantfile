@@ -8,7 +8,7 @@ Vagrant.configure("2") do |config|
 
     config.vm.provision "shell", inline: <<-SHELL
         apt-get update
-        apt-get install curl
+        apt-get install curl -q -y
         curl -sL https://deb.nodesource.com/setup_6.x | bash -
         apt-get install python-dev python-pip openjdk-7-jre-headless nodejs ruby-sass libjpeg-dev -q -y
         npm install -g coffee-script
