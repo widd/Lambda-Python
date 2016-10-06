@@ -74,7 +74,7 @@ signOut = () ->
 
   request.onload = =>
     if request.status == 200
-      setTopbarAuth()
+      window.location = "/"
     else
       console.error(request.responseText)
 
