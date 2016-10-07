@@ -21,7 +21,7 @@ def about():
         if request.headers['If-Modified-Since'] == start_last_modified:
             return Response(status=304)
 
-    response = Response(render_template('about.html'))
+    response = Response(render_template('about.html', allowed_types=app.config['ALLOWED_TYPES']))
     response.headers['Last-Modified'] = start_last_modified
 
     return response

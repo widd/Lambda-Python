@@ -42,14 +42,9 @@
     <p>Uploads from logged-in users are never automatically deleted.</p>
     <p>The following types are supported:</p>
     <ul class="csl">
-        <li>png</li>
-        <li>gif</li>
-        <li>jpg</li>
-        <li>mp3</li>
-        <li>ogg</li>
-        <li>opus</li>
-        <li>mp4</li>
-        <li>webm</li>
+        {% for filetype in allowed_types %}
+            <li>{{ filetype }}</li>
+        {% endfor %}
     </ul>
     </section>
 </main>
