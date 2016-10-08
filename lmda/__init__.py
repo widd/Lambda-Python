@@ -1,4 +1,5 @@
 import datetime
+import string
 import time
 import pytz
 import json
@@ -41,6 +42,10 @@ app.config['ALLOWED_TYPES'] = [
 app.config['NO_EXTENSION_TYPES'] = ['png', 'jpg', 'jpeg', 'gif', 'mp3']
 # Types to attempt to make a thumbnail for
 app.config['THUMBNAIL_TYPES'] = ['png', 'jpg', 'jpeg', 'gif', 'tiff', 'webp', 'svg']
+# Filename cipher key - all characters should be unique and it should be sufficiently long (default is 62 chars)
+app.config['BIJECTION_KEY'] = string.ascii_letters + string.digits
+# Minimum characters for file names
+app.config['MINIMUM_CHARS'] = 3
 # Images to use in replacement of a thumbnail for types
 app.config['GENERIC_IMAGES'] = {
     'png': '/static/img/generic/image.svg',
