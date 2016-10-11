@@ -213,8 +213,8 @@ def put_upload():
         db.session.add(db_file)
         db.session.commit()
 
-        filename = gen_bijective_filename(db_file.id) if app.config.get('BIJECTIVE_FILENAMES', False) \
-            else gen_filename()
+        filename = gen_bijective_filename(db_file.id, min_chars=app.config['MINIMUM_CHARS']) \
+            if app.config.get('BIJECTIVE_FILENAMES', False) else gen_filename()
         db_file.name = filename
         db.session.add(db_file)
         db.session.commit()
@@ -277,22 +277,23 @@ def put_upload():
         return Response(json.dumps(response, cls=ResponseEncoder), status=400, mimetype='application/json')
 
 
-def gen_bijective_filename(fid):
-    charset = string.ascii_letters + string.digits
+def gen_bijective_filename(fid, min_chars=1):
+    charset = app.config['BIJECTION_KEY']
     digits = []
 
     # Can't divide 0
     if fid == 0:
-        return 'a'
+        digits.append(0)
     else:
         while fid > 0:
             rem = fid % len(charset)
             digits.append(rem)
             fid /= len(charset)
 
-        digits.reverse()
+    digits.reverse()
 
-        return ''.join([charset[c] for c in digits])
+    result = ''.join([charset[c] for c in digits])
+    return charset[0] * (min_chars - len(result)) + result
 
 
 def gen_filename(max_tries=5, start_length=3, tries_per_len_incr=3):
